@@ -1,0 +1,31 @@
+<ion-popover-view>
+    <ion-list>
+        <ion-item ng-if="isOwner()" ng-click="clipActionEdit(clip.nid)">
+            Edit
+        </ion-item>
+        <ion-item ng-if="!isReport()" ng-click="clipActionBlock()">
+            Block
+        </ion-item>
+        <ion-item ng-if="isReport()" ng-click="clipActionBlock()">
+            Unblock
+        </ion-item>
+        <!--
+        commented to S7
+        <ion-item ng-click="clipFollowUser()">
+            <div ng-if="!isFollowUser()">
+                Follow User
+            </div>
+            <div ng-if="isFollowUser()">
+                Unfollow User
+            </div>
+        </ion-item>
+        <ion-item ng-click="clipFollowCollection()">
+            <div ng-if="!isFollowCollection()">
+                Follow Collection
+            </div>
+            <div ng-if="isFollowCollection()">
+                Unfollow Collection
+            </div>
+        </ion-item> -->
+    </ion-list>
+</ion-popover-view>

@@ -1,0 +1,38 @@
+<div ng-controller="ClipCtrl" class="popup-actions-list">
+    <!--
+    <div ng-if="checkBlocked(clip.bloked) && is_app" ng-click="shareClip()">
+        <i class="ion-share"></i>
+        <div class="title">Share</div>
+    </div>
+    -->
+    <div ng-if="clip.bloked !== 0 && canReclip()" ng-click="clipActionReclip(clip.nid)">
+        <i class="ion-scissors"></i>
+        <div class="title">Reclip</div>
+    </div>
+    <div ng-if="clip_owner" ng-click="clipActionEdit(clip.nid)">
+        <i class="ion-edit"></i>
+        <div class="title">Edit</div>
+    </div>
+    <div ng-if="!clip.voted && checkBlocked(clip.bloked)" ng-click="clipActionLike()">
+        <i class="ion-heart"></i>
+        <div class="title">Like</div>
+    </div>
+    <div ng-if="clip.voted && checkBlocked(clip.bloked)" ng-click="clipActionLike()" class="liked">
+        <i class="ion-heart"></i>
+        <div class="title">Unlike</div>
+    </div>
+    <!--
+    <div ng-if="!clip_owner && checkBlocked(clip.bloked) && !clip.shared_collection" ng-click="clipActionBlock()">
+        <i class="ion-ios-flag"></i>
+        <div class="title">Report</div>
+    </div>
+    -->
+    <div ng-if="!clip_owner && !checkBlocked(clip.bloked) && !clip.shared_collection" ng-click="clipActionBlock()" class="blocked">
+        <i class="ion-reply"></i>
+        <div class="title">Undo</div>
+    </div>
+    <div ng-click="clipActionComments(clip.nid)">
+        <i class="ion-chatbox"></i>
+        <div class="title">Comments</div>
+    </div>
+</div>

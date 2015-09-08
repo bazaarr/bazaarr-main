@@ -1,0 +1,4 @@
+<ul class="popup-select">
+    <li on-tap="addToNewCollection()">+ Add to a new Collection</li>
+    <li ng-repeat="col in collections" ng-click="popupSelectClick('clip.node.ph_bid', '{{col.bid}}', '{{col.name}}')">{{col.name}}</li>
+</ul>

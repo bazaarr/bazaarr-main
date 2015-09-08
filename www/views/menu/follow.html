@@ -1,0 +1,14 @@
+<div class="row buttons-switch">
+    <div class="col text-right">
+        <button class="button button-small button-calm" ng-class="{active: $state.includes('account.following-users')}"
+                ng-click="$state.go('account.following-users')">
+            Users
+        </button>
+    </div>
+    <div class="col">
+        <button class="button button-small button-calm" ng-class="{active: $state.includes('account.following-collections')}"
+                ng-click="$state.go('account.following-collections')">
+            Collections
+        </button>
+    </div>
+</div>

@@ -1,0 +1,147 @@
+<style>
+    .bazaarr-clip-it {
+        width: 100%;
+        top: 100%;
+        position: fixed;
+        bottom: 0;
+        padding: 0;
+        box-sizing: border-box;
+        z-index: 9999;
+        background: #fff;
+        transition: all 1s;
+    }
+
+    .bazaarr-clip-it.expanded {
+        top: 0;
+        overflow-y: scroll;
+    }
+
+    .bazaarr-clip-it.expanded > span {
+        display: none;
+    }
+
+    .images-list {
+        text-align: center;
+        padding-top: 46px;
+    }
+
+    .bazaarr-clip-it .cancel-btn {
+        display: none
+    }
+
+    .bazaarr-clip-it.expanded .cancel-btn {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 20px;
+        padding: 10px;
+        color: #43a5a6;
+        text-decoration: none
+    }
+
+    .bazaarr-clip-it span {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        font-size: 22px;
+        background: #43a5a6;
+        color: #FFF;
+        text-align: center;
+        text-decoration: none;
+        width: 100px;
+        padding: 10px;
+        margin: 20px;
+        box-sizing: border-box
+    }
+
+    .bazaarr-clip-it img {
+        margin: 0 1%;
+        max-width: 48%;
+        margin-top: 20px;
+    }
+
+    .bazaarr-clip-it.expanded .error-message {
+        font-size: 16px;
+        max-width: 80%;
+        margin: 0 auto;
+    }
+</style>
+<script>
+    localStorage.setItem('clip', {});
+    var bazaarrClipItShow = function () {
+        var wrapper = document.getElementsByClassName('bazaarr-clip-it')[0];
+        if (!wrapper.classList.contains('expanded')) {
+            wrapper.classList.add('expanded');
+            
+            var images = document.querySelectorAll('img');
+            var last = false;
+            for (var i = 0; i < images.length; i++) {
+                var parent_href     = images[i].parentNode.getAttribute("href");
+                var full_img_url    = "";
+                if (parent_href !== null) {
+                    full_img_url = bazaarrGetQueryVariable(parent_href, "imgurl");
+                }
+
+                var img_url = full_img_url || images[i].src;
+                
+                var last = i === (images.length - 1) ? true : false;
+                
+                bazaarrLoadImage(img_url, last);
+            }
+        }
+    };
+    var bazaarrClipImage = function (img) {
+        var clip = {};
+        clip.img = img.src;
+        clip.url = window.location.href;
+        localStorage.setItem('clip', JSON.stringify(clip));
+    };
+    var bazaarrClipItHide = function (e) {
+        var wrapper = document.getElementsByClassName('bazaarr-clip-it')[0];
+        wrapper.classList.remove('expanded');
+        var images_wrapper = wrapper.getElementsByClassName("images-list")[0];
+        images_wrapper.innerHTML = "";
+        e.preventDefault();
+    };
+    var bazaarrClipItInsert = function () {
+        if (!document.getElementsByClassName("bazaarr-clip-it").length > 0) {
+            var btn = document.createElement('div');
+            btn.className = 'bazaarr-clip-it';
+            btn.innerHTML = '<span onclick=\"bazaarrClipItShow()\">Clip It!</span><a href=\"#\" class=\"cancel-btn\" onclick=\"bazaarrClipItHide(event)\">Cancel</a><div class=\"images-list\"></div>';
+            document.body.insertBefore(btn, document.body.firstChild);
+        }
+    };
+    var bazaarrGetQueryVariable = function(query, variable) {
+        var vars = query.substring(query.indexOf('?') + 1).split('&');;
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split('=');
+            if (decodeURIComponent(pair[0]) == variable) {
+                return decodeURIComponent(pair[1]);
+            }
+        }
+    };
+    var bazaarrLoadImage = function(image_src, last) {
+        var wrapper = document.getElementsByClassName('bazaarr-clip-it')[0];
+        var images_wrapper = wrapper.getElementsByClassName('images-list')[0];
+        
+        var img = new Image;
+
+        img.onload = function() {
+            if (img.width > 320 && img.height > 320) {
+                images_wrapper.appendChild(img);
+
+                img.addEventListener('click', function () {
+                    bazaarrClipImage(this);
+                });
+            }
+            if (last && !images_wrapper.querySelectorAll('img').length) {
+                images_wrapper.innerHTML = '<div class="error-message">Image not found or is too small to add - it should be more then 320*320</div>';
+            }
+        };
+        
+        img.src = image_src
+    };
+    bazaarrClipItInsert();
+</script>

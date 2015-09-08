@@ -1,0 +1,66 @@
+<ion-scroll> <!-- on-scroll="scrollCollections()" -->
+    <ion-refresher on-refresh="doRefresh()"></ion-refresher>
+
+    <ng-include ng-if="$state.includes('account.following-collections')" src="'views/menu/follow.html'"></ng-include>
+    <ng-include ng-repeat="collection in collections" src="'views/user/collection.html'" class="coll-row-wrapper"></ng-include>
+    <div style="height: 100px;"></div>
+    <!--div class="collections-wrapper">
+        <div ng-if="user.uid == account.uid && $state.includes('account.collections')" class="add-collection-button" ng-click="goAddCollection()">
+            Add collection
+        </div>
+        <div ng-repeat="coll in collections" class="collection" ng-class="{'shared' : coll.is_shared, 'private': coll.access_view == 'private'}">
+            <div class="icons-wrapper">
+                <i ng-if="coll.is_shared && user.uid == coll.uid" class="col-icon ion-ios-people"></i>
+                <i ng-if="coll.access_view == 'private'" class="col-icon ion-locked"></i>
+            </div>
+            <div>
+                <div class="name" on-tap="openCollection(coll.bid)">
+                    {{coll.name}}
+                </div>
+                <div ng-if="coll.uid != $state.params['userId'] && $state.includes('account.collections')" class="shared-name">
+                    Shared from <a href="#!/account/{{coll.uid}}/collections">{{coll.user_name}}</a>
+                </div>
+            </div>
+            <div class="col-bottom">
+                <div class="clips_count">
+                    {{coll.clips_count}} clip{{coll.clips_count == 1 ? '' : 's'}}
+                </div>
+                <div ng-if="isLogin()">
+                    // Edit own collection btn
+                    <div class="edit-btn" ng-if="coll.can_edit && coll.uid==$state.params['userId']">
+                        <button class="button button-block button-calm" ng-click="goEditCollection(coll.bid)">
+                            <i class="ion-edit"></i> Edit
+                        </button>
+                    </div>
+                    // Actions on Shared collections
+                    <div class="edit-btn" ng-if="isMyAccount() && coll.type=='shared' && coll.accepted">
+                        <button class="button button-block button-calm" ng-click="accept_collection(coll, 3)">
+                            Remove
+                        </button>
+                    </div>
+                    <div class="edit-btn buttons-inline" ng-if="isMyAccount() && coll.type=='shared' && !coll.accepted">
+                        <button class="button button-calm" ng-click="accept_collection(coll, 1)">
+                            Accept
+                        </button>
+                        <button class="button button-calm" ng-click="accept_collection(coll, 0)">
+                            Decline
+                        </button>
+                    </div>
+                    // Follow/Unfollow other collection btn
+                    <div class="edit-btn" ng-if="!coll.can_edit && user.uid && user.uid != coll.uid">
+                        <button class="button button-block button-calm"
+                                ng-click="followCollection(coll, coll.follow)">
+                            <div ng-if="coll.follow">
+                                <i class="ion-minus-round"></i> Unfollow
+                            </div>
+                            <div ng-if="!coll.follow">
+                                <i class="ion-plus-round"></i> Follow
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="height: 150px;"></div>
+    </div-->
+</ion-scroll>

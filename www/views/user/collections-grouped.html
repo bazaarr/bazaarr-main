@@ -1,0 +1,22 @@
+<div class="grouped_list">
+    <div ng-if="grouped_list['public'] && isMyAccount()" class="grouped_list_title">Public Collections - Visible to everyone.</div>
+    <ng-include ng-if="grouped_list['public']" ng-repeat="collection in grouped_list['public']" src="'views/user/collection.html'"></ng-include>
+    <div ng-if="!grouped_list['public'] && isMyAccount()" class="row">
+        <div class="col" ng-class="'col-' + col_width">
+            <div class="collection add" ng-click="goAddCollection()">
+                <button class="button button-dark">
+                    <i class="ion-plus-round"></i>
+                </button><br />
+                Add collection
+            </div>
+        </div>
+    </div>
+</div>
+<div class="grouped_list" ng-if="grouped_list['private']">
+    <div ng-if="isMyAccount()" class="grouped_list_title">Private Collections - only you and people you invite can see this collections.</div>
+    <ng-include ng-repeat="collection in grouped_list['private']" src="'views/user/collection.html'"></ng-include>
+</div>
+<div ng-if="isMyAccount() && grouped_list['shared']" class="grouped_list">
+    <div class="grouped_list_title">Shared Collections - you can add and edit clips in these collections together with the other users.</div>
+    <ng-include ng-repeat="collection in grouped_list['shared']" src="'views/user/collection.html'"></ng-include>
+</div>

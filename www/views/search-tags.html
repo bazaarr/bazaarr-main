@@ -1,0 +1,38 @@
+<ion-view>
+    <div class="bar bar-dark bar-header item-input-inset search-bar">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+        <div class="item-input-wrapper item-button-right">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <form>
+                <input name="search" type="search" placeholder="search" ng-model="search.search_api_views_fulltext"
+                       ng-keydown="searchInputKeyPress($event, search)" class="search-top-input" ng-model-options="{ debounce: 1000 }"/>
+                <div class="button button-clear" ng-click="resetSearchResults(1)">
+                    <i class="ion-close-round"></i>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <ion-content has-header="true" has-tabs="true" on-swipe-right="backCondition()" class="search-all">
+        <div class="search-section users" ng-if="tags.length > 0">
+            <ion-list class="tags-list">
+                <ion-item ng-repeat="tag in tags">
+                    <div class="row row-center">
+                        <div class="col" on-tap="$state.go('hashtag', {'hashtagName' : tag.name})">
+                            <div class="name" on-tap="$state.go('collection', {'colId' : collection.bid})">
+                                #{{tag.name}}
+                            </div>
+                            <div class="info">
+                                {{tag.clips_count}} clip{{tag.clips_count == 1 ? '' : 's'}}
+                            </div>
+                        </div>
+                    </div>
+                </ion-item>
+            </ion-list>
+        </div>
+        <div class="search-no-results" ng-if="tags.length == 0">No results</div>
+    </ion-content>
+</ion-view>

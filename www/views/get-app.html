@@ -1,0 +1,65 @@
+<ion-view>
+    <ion-nav-title>
+        How to add to Home screen
+    </ion-nav-title>
+    <ion-nav-buttons side="primary">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary"></ion-nav-buttons>
+    <ion-content on-swipe-right="back()">
+        <div class="instruction android" ng-if="isAndroid()">
+            <p>
+                Tap three dots on the top bar to open menu
+            </p>
+            <div class="image">
+                <img src="/m/images/get-app/android-1.png">
+            </div>
+            <p>
+                Tap "Add to homescreen"
+            </p>
+            <div class="image">
+                <img src="/m/images/get-app/android-2.png">
+            </div>
+            <p>
+                Type title of the bookmark and tap "Add" button
+            </p>
+            <div class="image">
+                <img src="/m/images/get-app/android-3.png">
+            </div>
+            <p>
+                Now you can open Bazaarr from the Home Screen
+            </p>
+            <div class="image">
+                <img src="/m/images/get-app/android-4.png">
+            </div>
+        </div>
+        <div class="instruction ios" ng-if="isIOS()">
+            <p>
+                Tap on the Share button
+            </p>
+            <div class="image">
+                <img src="/m/images/get-app/ios-1.png">
+            </div>
+            <p>
+                Tap "Add to Home Screen"
+            </p>
+            <div class="image">
+                <img src="/m/images/get-app/ios-2.png">
+            </div>
+            <p>
+                Type title of the bookmark and tap "Add" button
+            </p>
+            <div class="image">
+                <img src="/m/images/get-app/ios-3.png">
+            </div>
+            <p>
+                Now you can open Bazaarr from the Home Screen
+            </p>
+            <div class="image">
+                <img src="/m/images/get-app/ios-4.png">
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

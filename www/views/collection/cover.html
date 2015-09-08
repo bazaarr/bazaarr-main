@@ -1,0 +1,70 @@
+<ion-view view-title="">
+    <ion-nav-buttons side="primary">
+        <button class="button" on-tap="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+        <div ng-if="user.uid && user.uid == collection.uid" class="col actions">
+            <button on-tap="addClipFromCollection(collection)" class="cover-btn">
+                <i class="ion-plus-round"></i>
+            </button>
+            <button on-tap="goEditCollection(collection.bid)" class="cover-btn">
+                <i class="ion-edit"></i>
+            </button>
+        </div>
+        <button class="cover-btn" ng-if="collection.uid!=user.uid && collection.accepted=='1'" ng-click="accept_collection(collection, collection.accepted=='1' ? 3 : 0)">
+            Remove
+        </button>
+        <button class="cover-btn" ng-if="collection.uid!=user.uid"
+                ng-click="followCollection(collection.bid, collection.follow)">
+            <div ng-if="collection.follow">
+                Unfollow
+            </div>
+            <div ng-if="!collection.follow">
+                Follow
+            </div>
+        </button>
+    </ion-nav-buttons>
+    
+    <ion-content class="padding collection-view" scroll="false" has-bouncing="false" has-header="true" has-tabs="true" on-swipe-right="back()">
+        <div class="background-full-image-wrapper">
+            <img class="background-full-image" ng-src="{{collection.cover_img}}">
+        </div>
+        <div class="cover-shadow">
+            <div class="collection-actions">
+                <button class="collection-action" ng-if="collection.uid!=user.uid && collection.accepted=='0'" ng-click="accept_collection(collection, 1)">
+                    <i class="ion-checkmark"></i>
+                    <div>
+                        Accept
+                    </div>
+                </button>
+                <button class="collection-action" ng-if="collection.uid!=user.uid && collection.accepted=='0'" ng-click="accept_collection(collection, collection.accepted=='1' ? 3 : 0)">
+                    <i class="ion-close"></i>
+                    <div>
+                        Decline
+                    </div>
+                </button>
+            </div>
+            <div class="clickable-area" on-tap="openClip(collection.last_clip_id)"></div>
+            <div class="col-name">{{collection.name}}</div>
+            <div class="col-desc">{{collection.description}}</div>
+            
+            <div class="col-owner">
+                <div class="name">By <span ng-repeat="owner in collection.owners">{{owner.name}}<span ng-if='!$last'>, </span></span></div>
+                <img ng-repeat="owner in collection.owners" on-tap="StateService.goAccount(owner.uid)" ng-src="{{owner.image}}" width="60" />
+            </div>
+            
+            <div class="col-counters">
+                <a href="#!/collection-view/{{collection.bid}}" class="stat">{{collection.count_clips || 0}}<div>Clips</div></a>
+                <a href="#!/collection-likes/{{collection.bid}}" class="stat">{{collection.count_likes || 0}}<div>Likes</div></a>
+                <a href="#!/collection-reclips/{{collection.bid}}" class="stat">{{collection.count_reclips || 0}}<div>Reclips</div></a>
+                <a href="#!/collection-follows/{{collection.bid}}" class="stat">{{collection.count_followers || 0}}<div>Followers</div></a>
+                <div class="clearfix"></div>
+            </div>
+            <div class="col-cover-link">
+                Image: {{collection.cover_url || "None"}}
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

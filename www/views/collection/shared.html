@@ -1,0 +1,50 @@
+<ion-view view-title="Who can view my collection">
+    <ion-nav-buttons side="primary">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+        <button class="button" ng-click="saveShared(checked_data, collection.bid)">
+            <i class="ion-checkmark-round"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-content has-header="true" class="padding shared" on-swipe-right="back()">
+        <div class="padding balanced-bg" ng-if="suc_mess"><i class="icon ion-checkmark-circled"></i> {{suc_mess}}</div>
+        <div class="padding assertive-bg" ng-if="err_mess"><i class="icon ion-minus-circled"></i> {{err_mess}}</div>
+        <div class="filters-list limit-width">
+            <ion-tabs delegate-handle="shared-tabs">
+                <ion-tab title="All">
+                    <div style="opacity:0">All</div>
+                </ion-tab>
+                <ion-tab title="Only me">
+                    <div style="opacity:0">Only me</div>
+                </ion-tab>
+                <ion-tab title="Select">
+                    <div class="list list-inset">
+                        <div class="item item-input">
+                            <input type="text" placeholder="Search" ng-model="search" ng-keyup="searchUsers(search)" class="search-user-field">
+                            <button class="button button-small button-stable" ng-click="searchUsers(search, 1)"><i class="icon ion-search"></i></button>
+                        </div>
+                    </div>
+                    <ul class="list">
+                        <li ng-repeat="(uid, check) in checked_data" ng-if="!check" class="item item-checkbox">
+                            <label class="checkbox">
+                                <input ng-model="checked_data[uid]" type="checkbox">
+                            </label>
+                            {{u_list[uid]}}
+                        </li>
+                    </ul>
+                    <ul class="list">
+                        <li ng-repeat="(uid, check) in checked_data" ng-if="check" class="item item-checkbox">
+                            <label class="checkbox">
+                                <input ng-model="checked_data[uid]" type="checkbox" >
+                            </label>
+                            {{u_list[uid]}}
+                        </li>
+                    </ul>
+                </ion-tab>
+            </ion-tabs>
+        </div>
+    </ion-content>
+</ion-view>

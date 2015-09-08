@@ -1,0 +1,15 @@
+<html>
+<body>
+<script src="js/openfb/openfb.js"></script>
+<script>
+    if(("standalone" in window.navigator) && window.navigator.standalone){
+        window.openFB.oauthCallback(window.location.href);
+        window.location = window.location.protocol + "//" + window.location.host + "/m/#!/oauthcallback";
+    }
+    else {
+        window.opener.openFB.oauthCallback(window.location.href);
+        window.close();
+    }
+</script>
+</body>
+</html>

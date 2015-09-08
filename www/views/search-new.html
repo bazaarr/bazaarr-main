@@ -1,0 +1,105 @@
+<ion-view>
+    <div class="bar bar-dark bar-header item-input-inset search-bar">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+        <div class="item-input-wrapper item-button-right">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <form>
+                <input name="search" type="search" placeholder="search" ng-model="search.search_api_views_fulltext"
+                       ng-keydown="searchInputKeyPress($event, search)" class="search-top-input"/>
+                <div class="button button-clear" ng-click="resetSearchResults(1)">
+                    <i class="ion-close-round"></i>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <ion-content delegate-handle="clipList" has-header="true" has-tabs="true" on-swipe-right="backCondition()" class="search-all">
+        <div class="search-section users" ng-if="users.length > 0">
+            <label>Users</label>
+            <div class="show-all" on-tap="$state.go('search-users', {'query' : search.search_api_views_fulltext})">Show all</div>
+            <ion-list class="users-list">
+                <ion-item ng-repeat="user in users" on-tap="$state.go('account.collections', {'userId' : user.uid})">
+                    <div class="row row-center">
+                        <div class="col text-center image">
+                            <img ng-src="{{user.img.small}}" width="40" />
+                        </div>
+                        <div class="col">
+                            <div class="name">{{user.name}}</div>
+                            <div class="info">{{user.clips_count}} clips · {{user.follow_count}} {{user.follow_count==1 ? 'follower' : 'followers'}} </div>
+                        </div>
+                    </div>
+                </ion-item>
+            </ion-list>
+        </div>
+        <div class="search-section tags" ng-if="tags.length > 0">
+            <label>Tags</label>
+            <div class="show-all" on-tap="$state.go('search-tags', {'query' : search.search_api_views_fulltext})">Show all</div>
+            <ion-list class="tags-list">
+                <ion-item ng-repeat="tag in tags">
+                    <div class="row row-center">
+                        <div class="col" on-tap="$state.go('hashtag', {'hashtagName' : tag.name})">
+                            <div class="name" on-tap="$state.go('collection', {'colId' : collection.bid})">
+                                #{{tag.name}}
+                            </div>
+                            <div class="info">
+                                {{tag.clips_count}} clip{{tag.clips_count == 1 ? '' : 's'}}
+                            </div>
+                        </div>
+                    </div>
+                </ion-item>
+            </ion-list>
+        </div>
+        <div class="search-section collections" ng-if="collections.length > 0">
+            <label>Collections</label>
+            <div class="show-all" on-tap="$state.go('search-collections', {'query' : search.search_api_views_fulltext})">Show all</div>
+            <ion-list class="collections-list">
+                <ion-item ng-repeat="collection in collections">
+                    <div class="row row-center">
+                        <div class="col text-center image">
+                            <img ng-src="{{collection.cover_img}}" width="40" />
+                        </div>
+                        <div class="col">
+                            <div class="name" on-tap="$state.go('collection', {'colId' : collection.bid})">
+                                {{collection.name}}
+                            </div>
+                            <div class="info">
+                                By <span on-tap="$state.go('account.collections', {'userId' : collection.uid})">{{collection.user_name}}</span> · {{collection.clip_count}} clips
+                            </div>
+                        </div>
+                    </div>
+                </ion-item>
+            </ion-list>
+        </div>
+        <div class="search-section clips" ng-if="clips.length > 0">
+            <div class="show-all" on-tap="$state.go('search-clips', {'query' : search.search_api_views_fulltext})">Show all</div>
+            <label>Clips</label>
+            <!-- Clips list -->
+            <ion-list class="collections-list">
+                <ion-item ng-repeat="clip in clips">
+                    <div class="row row-center">
+                        <div class="col text-center image" on-tap="openClip(clip)">
+                            <img ng-src="{{clip.img}}" width="40" />
+                        </div>
+                        <div class="col" on-tap="$state.go('account.collections', {'userId' : clip.owner.id})">
+                            <div class="name">
+                                {{clip.owner.name}}
+                            </div>
+                            <div class="info">
+                                <span>{{clip.owner.coll_name}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </ion-item>
+            </ion-list>
+        </div>
+        <div class="search-links" ng-if="!clips.length && !collections.length && !tags.length && !users.length">
+            <a href="#!/search-users/">Users</a>
+            <a href="#!/search-tags/">Tags</a>
+            <a href="#!/search-collections/">Collections</a>
+            <a href="#!/search-clips/">Clips</a>
+        </div>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,25 @@
+<ion-scroll>
+    <ion-refresher on-refresh="doRefresh()"></ion-refresher>
+    <ng-include ng-if="$state.includes('account.following-users')" src="'views/menu/follow.html'"></ng-include>
+    <ion-list class="users-list">
+        <ion-item ng-repeat="follow in follows">
+            <div class="row row-center">
+                <div class="col col-25 text-center" on-tap="$state.go('account.collections', {'userId' : follow.uid})">
+                    <img src="{{follow.img.small}}" width="60px" />
+                </div>
+                <div class="col name" on-tap="$state.go('account.collections', {'userId' : follow.uid})">{{follow.name}}</div>
+                <div class="col col-25 text-right b-wr">
+                    <button ng-if="isMyAccount()" class="button button-small button-calm" on-tap="followUser(follow.uid, follow.type, $index)">
+                        <div ng-if="follow.type">
+                            <i class="ion-plus-round"></i> Follow
+                        </div>
+                        <div ng-if="!follow.type">
+                            <i class="ion-minus-round"></i> Unfollow
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </ion-item>
+    </ion-list>
+    <div style="height: 100px;"></div>
+</ion-scroll>

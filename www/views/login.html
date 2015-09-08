@@ -1,0 +1,29 @@
+<ion-view class="page-login" view-title=" " hide-nav-bar="true">
+    <ion-nav-buttons side="secondary"></ion-nav-buttons>
+    <ion-content has-header="true" class="padding" has-bouncing="false">
+        <div class="align-helper">
+            <div class="limit-width-380">
+                <div class="padding assertive-bg" ng-if="err_mess"><i class="icon ion-minus-circled"></i> {{err_mess}}</div>
+                <img class="login-logo" src="images/Logo@2x.png" width="200" />
+                <div class="list">
+                    <label class="item item-input">
+                        <span class="input-label">Username</span>
+                        <input type="text" ng-model="user.username" ng-keypress="checkKey($event)">
+                    </label>
+                    <label class="item item-input">
+                        <span class="input-label">Password</span>
+                        <input type="password" ng-model="user.password" ng-keypress="checkKey($event)">
+                    </label>
+                </div>
+                <div>
+                    <button class="button button-block button-dark login-btn" ng-click="signIn(user)">
+                        Sign In
+                    </button>
+                </div>
+                <div class="login-button-fb text-center"><a ng-click="fbLogin()">Log In with Facebook</a></div>
+                <div class="login-button-pass text-center"><a href="#!/forgot-password">Forgot password?</a></div>
+                <div class="login-button-reg text-center"><a href="#!/registration">Don't have an account?</a></div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

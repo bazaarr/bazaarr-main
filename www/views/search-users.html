@@ -1,0 +1,37 @@
+<ion-view>
+    <div class="bar bar-dark bar-header item-input-inset search-bar">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+        <div class="item-input-wrapper item-button-right">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <form>
+                <input name="search" type="search" placeholder="search" ng-model="search.search_api_views_fulltext"
+                       ng-keydown="searchInputKeyPress($event, search)" class="search-top-input"/>
+                <div class="button button-clear" ng-click="resetSearchResults(1)">
+                    <i class="ion-close-round"></i>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <ion-content delegate-handle="clipList" has-header="true" has-tabs="true" on-swipe-right="backCondition()" class="search-all">
+        <div class="search-section users" ng-if="users.length > 0">
+            <ion-list class="users-list">
+                <ion-item ng-repeat="user in users" on-tap="$state.go('account.collections', {'userId' : user.uid})">
+                    <div class="row row-center">
+                        <div class="col text-center image">
+                            <img src="{{user.img.small}}" width="40" />
+                        </div>
+                        <div class="col">
+                            <div class="name">{{user.name}}</div>
+                            <div class="info">{{user.clips_count}} clips · {{user.follow_count}} {{user.follow_count==1 ? 'follower' : 'followers'}} </div>
+                        </div>
+                    </div>
+                </ion-item>
+            </ion-list>
+        </div>
+        <div class="search-no-results" ng-if="users.length == 0">No results</div>
+    </ion-content>
+</ion-view>

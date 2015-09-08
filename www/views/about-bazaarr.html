@@ -1,0 +1,28 @@
+<ion-view class="page-about" view-title="About Bazaarr">
+    <ion-nav-buttons side="primary">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-content has-header="true" class="padding limit-width" on-swipe-right="back()">
+        <div class="filters-list tabs-about limit-width">
+            <ion-tabs>
+                <ion-tab title="{{about_data[0].title}}">
+                    <div>
+                        <div ng-bind-html="about_data[0].body"></div>
+                    </div>
+                </ion-tab>
+                <ion-tab title="{{about_data[1].title}}">
+                    <div class="fix-font">
+                        <div ng-bind-html="about_data[1].body"></div>
+                    </div>
+                </ion-tab>
+                <ion-tab title="{{about_data[2].title}}">
+                    <div class="fix-font">
+                        <div ng-bind-html="about_data[2].body"></div>
+                    </div>
+                </ion-tab>
+            </ion-tabs>
+        </div>
+    </ion-content>
+</ion-view>

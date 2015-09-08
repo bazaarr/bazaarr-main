@@ -1,0 +1,26 @@
+<ion-view class="page-about" view-title="Claim Account">
+    <ion-nav-buttons side="primary">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary"></ion-nav-buttons>
+    <ion-content has-header="true" class="padding limit-width" on-swipe-right="back()">
+		<div class="list">
+			<label class="item item-input">
+				<input ng-model="params.firstname" type="text" placeholder="First Name" />
+			</label>
+			<label class="item item-input">
+				<input ng-model="params.lastname" type="text" placeholder="Last Name" />
+			</label>
+			<label class="item item-input">
+		    	<input type="mail" ng-model="params.email" placeholder="Email" />
+			</label>
+			<label class="item item-input">
+				<button ng-if="is_ready" class="button" ng-click="openPhotoSourcePopup()">Add Photo</button>
+	            <input ng-if="!is_ready" accept="image/*;capture=camera" type="file" onchange="angular.element(this).scope().changedFile(this)"/>	
+			</label>
+		</div>
+    	<button class="button" ng-click="submitClaim(params, file)">Claim</button>
+    </ion-content>
+</ion-view>

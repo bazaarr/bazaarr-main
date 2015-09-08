@@ -1,0 +1,88 @@
+<ion-view view-title="{{product.title}}" class="view-clip-content">
+    <ion-nav-buttons side="primary">
+        <button class="button" on-tap="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+        <button ng-controller="ClipCtrl" class="button" ng-if="canReclip()" on-tap="clipActionReclip()">
+            <i class="ion-scissors"></i>
+        </button>
+        <button ng-controller="ClipCtrl" class="button action-like" ng-if="clip.bloked !== 0" on-tap="clipActionLike()">
+            <i class="ion-heart liked" ng-if="clip.voted"></i>
+            <i class="ion-heart" ng-if="!clip.voted"></i>
+        </button>
+        <button ng-controller="ClipCtrl" class="button" on-tap="clipActionComments(clip.nid)">
+            <i class="ion-chatbox"></i>
+        </button>
+    </ion-nav-buttons>
+
+    <ion-content class="padding ebay-page" has-header="true" has-tabs="true">
+        <!--<img ng-repeat="pic in product.PictureURL" src="{{pic}}">-->
+        <div class="limit-width">
+            <div class="top-wrapper">
+                <img src="{{product.PictureURL}}" ng-if="product.isSinglePic" on-swipe-right="back()">
+                <ion-slide-box ng-if="!product.isSinglePic">
+                    <ion-slide ng-repeat="pic in product.PictureURL">
+                        <img src="{{pic}}">
+                    </ion-slide>
+                </ion-slide-box>
+                <div class="padding text" on-swipe-right="back()">
+                    <div class="title">{{product.Title}}</div>
+                    <div class="price">${{product.CurrentPrice}}</div>
+                    <div class="button-buy" on-tap="openInApp(product.ViewItemURLForNaturalSearch, false, false)">BUY</div>
+                </div>
+            </div>
+            <div on-swipe-right="back()">
+                <div class="properties">
+                    <div class="p-item" ng-if="product.ConditionDisplayName">
+                        <label>Condition</label>
+                        <span>{{product.ConditionDisplayName}}</span>
+                    </div>
+                    <div class="p-item" ng-if="product.ConditionDescriptionShort">
+                        <label>Seller notes</label>
+                        <span>{{product.ConditionDescriptionShort}}
+                            <div ng-controller="InputCtrl" ng-click="openPopup('full-text', product.ConditionDescription, product.ConditionDescription, 'Seller notes')"
+                                 ng-if="product.ConditionDescription.length > 60" class="link">
+                                Read More
+                            </div>
+                        </span>
+                    </div>
+                    <div class="p-item" ng-if="product.ConditionDisplayName">
+                        <label>Time left</label>
+                        <span>{{product.ConditionDisplayName}}</span>
+                    </div>
+                    <div class="p-item" ng-if="product.Quantity">
+                        <label>Quantity</label>
+                        <span>{{product.Quantity}}</span>
+                    </div>
+                    <div class="p-item" ng-if="prop.Value" ng-repeat="prop in product.ItemSpecifics.NameValueList">
+                        <label>{{prop.Name}}</label>
+                        <span>{{prop.Value}}</span>
+                    </div>
+                </div>
+                <div class="properties-title">
+                    Shipping, Returns and Payments
+                </div>
+                <div class="properties">
+                    <div class="p-item" ng-if="product.Location">
+                        <label>Ships from</label>
+                        <span>{{product.Location}}</span>
+                    </div>
+                    <div class="p-item" ng-if="product.PaymentMethods">
+                        <label>Payments</label>
+                        <span>{{product.PaymentMethods}}</span>
+                    </div>
+                </div>
+                <div class="properties-title">
+                    About the seller
+                </div>
+                <div class="properties seller">
+                    <div>{{product.Seller.UserID}} ({{product.Seller.FeedbackScore}})</div>
+                    <div>{{product.Seller.PositiveFeedbackPercent}} Positive Feedback</div>
+                </div>
+                <div class="text-center original-link" on-tap="openInApp(feed_html.url, false, false)">View original source</div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

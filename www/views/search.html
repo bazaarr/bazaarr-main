@@ -1,0 +1,114 @@
+<ion-view>
+    <div class="bar bar-dark bar-header item-input-inset search-bar">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+        <div class="item-input-wrapper item-button-right">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <form>
+                <input name="search" type="search" placeholder="search" ng-model="search.search_api_views_fulltext"
+                       ng-keydown="searchInputKeyPress($event, search)" class="search-top-input"/>
+                <div class="button button-clear" ng-click="resetSearchResults(1)">
+                    <i class="ion-close-round"></i>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <ion-content has-header="true" has-tabs="true" on-swipe-right="back()">
+        <div class="limit-width filters-list">
+            <ion-tabs class="search-type-tabs">
+                <ion-tab title="Clips">
+                    <div class="clips-types">
+                        <button ng-class="{ 'active' : search.price_type == 2 }" ng-click="selectType(2, 0.01, '')">With Prices</button>
+                        <button ng-class="{ 'active' : search.price_type == 1 }" ng-click="selectType(1, 0, 0)">Without Prices</button>
+                        <button ng-class="{ 'active' : search.price_type == 0 }" ng-click="selectType(0, '', '')">All</button>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="filters-list search-clips-tabs">
+                        <ion-tabs>
+                            <ion-tab title="Categories<span class='ico ion-chevron-down'></span>">
+                                <div class="select-category">
+                                    <ion-radio ng-model="search.field_category" ng-value="'All'">All</ion-radio>
+                                    <ion-radio ng-repeat="cat in categories" ng-model="search.field_category" ng-value="'{{cat.tid}}'">{{cat.name}}</ion-radio>
+                                </div>
+                            </ion-tab>
+                            <ion-tab title="Colors<span class='ico ion-chevron-down'></span>">
+                                <div class="select-color">
+                                    <ion-radio ng-repeat="item in searchColors"
+                                               ng-model="search"
+                                               ng-class="checkColor(item.r, item.g, item.b)"
+                                               ng-click="selectColor(item.r, item.g, item.b)"
+                                               name="color-group"
+                                               style="background-color: rgb({{item.r}}, {{item.g}}, {{item.b}})">
+                                    </ion-radio>
+                                </div>
+                            </ion-tab>
+                            <ion-tab title="Options<span class='ico ion-chevron-down'></span>">
+                                <ion-list class="search-options">
+                                    <ion-item ng-controller="InputCtrl" ng-click="openPopup('select-price', 'search.price', search.price, 'Price')" ng-if="search.price_type != 1">
+                                        <div class="row">
+                                            <div class="col label">Price</div>
+                                            <div class="col value text-right">{{search.price_title}}</div>
+                                            <div class="col col-10 text-right"><i class="ion-chevron-right"></i></div>
+                                        </div>
+                                    </ion-item>
+                                    <ion-item ng-controller="InputCtrl" ng-click="openPopup('select-sort_by', 'search.sort_by', search.sort_by, 'Order by')">
+                                        <div class="row">
+                                            <div class="col label">Sort by</div>
+                                            <div class="col value text-right">{{search.sort_by_title}}</div>
+                                            <div class="col col-10 text-right"><i class="ion-chevron-right"></i></div>
+                                        </div>
+                                    </ion-item>
+                                    <ion-item ng-controller="InputCtrl" ng-click="openPopup('select-sort_order', 'search.sort_order', search.sort_order, 'Order by')">
+                                        <div class="row">
+                                            <div class="col label">Order by</div>
+                                            <div class="col value text-right">{{search.sort_order_title}}</div>
+                                            <div class="col col-10 text-right"><i class="ion-chevron-right"></i></div>
+                                        </div>
+                                    </ion-item>
+                                </ion-list>
+                            </ion-tab>
+                        </ion-tabs>
+                    </div>
+                </ion-tab>
+                <ion-tab title="Collections" on-select="search.search_api_views_fulltext ? goSearchResults(search) : ''">
+                    <div >
+                        <ion-list class="collections-list">
+                            <ion-item ng-repeat="collection in collections">
+                                <div class="row row-center">
+                                    <div class="col">
+                                        <div class="name" on-tap="$state.go('collection', {'colId' : collection.bid})">
+                                            {{collection.name}}
+                                        </div>
+                                        <div class="info">
+                                            By <span on-tap="$state.go('account.collections', {'userId' : collection.uid})">{{collection.user_name}}</span> · {{collection.clip_count}} clips
+                                        </div>
+                                    </div>
+                                </div>
+                            </ion-item>
+                        </ion-list>
+                    </div>
+                </ion-tab>
+                <ion-tab title="Users" on-select="search.search_api_views_fulltext ? goSearchResults(search) : ''">
+                    <div >
+                        <ion-list class="users-list">
+                            <ion-item ng-repeat="user in users" on-tap="$state.go('account.collections', {'userId' : user.uid})">
+                                <div class="row row-center">
+                                    <div class="col col-25 text-center image">
+                                        <img src="{{user.img.small}}" width="60px" />
+                                    </div>
+                                    <div class="col">
+                                        <div class="name">{{user.name}}</div>
+                                        <div class="info">{{user.clips_count}} clips · {{user.follow_count}} {{user.follow_count==1 ? 'follower' : 'followers'}} </div>
+                                    </div>
+                                </div>
+                            </ion-item>
+                        </ion-list>
+                    </div>
+                </ion-tab>
+            </ion-tabs>
+        </div>
+    </ion-content>
+</ion-view>

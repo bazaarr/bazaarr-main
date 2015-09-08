@@ -1,0 +1,72 @@
+<ion-view view-title="Notes" class="comments">
+    <ion-nav-buttons side="primary">
+        <button class="button" on-tap="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+    </ion-nav-buttons>
+
+    <ion-content class="padding clip-stats" has-header="true" has-tabs="true" on-swipe-right="back()">
+        <div class="limit-width">
+            <h2 ng-if="reclip_users.length">Reclips</h2>
+            <ion-list class="users-list reclips">
+                <ion-item ng-repeat="user in reclip_users">
+                    <div class="row row-center">
+                        <div class="col col-25 img text-center" on-tap="$state.go('account.collections', {'userId' : user.uid})">
+                            <img src="{{user.img.small}}" width="40" />
+                        </div>
+                        <div class="col">
+                            <div class="name" on-tap="$state.go('account.collections', {'userId' : user.uid})">{{user.name}}</div>
+                            onto <div on-tap="$state.go('collection', {'colId' : user.collection_id})">{{user.collection_name}}</div>
+                        </div>
+                    </div>
+                </ion-item>
+            </ion-list>
+            <a ng-if="reclip_users.length" href="#!/clip-reclips/{{$state.params.clipId}}" class="more">More...</a>
+            <h2 ng-if="like_users.length">Likes</h2>
+            <ion-list class="users-list likes">
+                <ion-item ng-repeat="user in like_users">
+                    <div on-tap="$state.go('account.collections', {'userId' : user.uid})">
+                        <img src="{{user.img.small}}" width="40" />
+                    </div>
+                    <div>
+                        <div class="name" on-tap="$state.go('account.collections', {'userId' : user.uid})">{{user.name}}</div>
+                    </div>
+                </ion-item>
+            </ion-list>
+            <a ng-if="like_users.length" href="#!/clip-likes/{{$state.params.clipId}}" class="more">More...</a>
+            <h2>Comments</h2>
+            <ion-list>
+                <ion-item ng-repeat="comment in comments" class="comment-item" on-hold='openActionsPopup(comment)'>
+                    <div class="comment">
+                        <a href="#!/account/{{comment.uid}}/collections" class="image">
+                            <img src="{{comment.picture.small}}" width="60" />
+                        </a>
+                        <div class="body">
+                            <a href="#!/account/{{comment.uid}}/collections">{{comment.name}}</a><br />
+                            {{comment.body_value}}
+                        </div>
+                    </div>
+                </ion-item>
+            </ion-list>
+            <div class="comment-field" ng-if="isLogin()">
+                <div class="input-wrapper">
+                     <textarea rows="4" class="comment-input" ng-model="new_comment.body_value" placeholder="Add a comment"
+                               ng-keydown="textareaLimit(this, 4, 80);"
+                               ng-keyup="textareaLimit(this, 4, 80);"
+                               ng-paste="textareaLimit(this, 4, 80);"
+                               style="overflow: hidden; resize: none;"></textarea>
+                </div>
+                <div class="button-wrappper send-comment-button">
+                    <button class="button button-small button-calm" ng-click="addComment()">
+                        Send
+                    </button>
+                </div>
+            </div>
+            <div ng-if="!isLogin()" class="login-button-reg text-center comment">
+                <a on-tap="goLogin()">Sign in to post comment</a>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

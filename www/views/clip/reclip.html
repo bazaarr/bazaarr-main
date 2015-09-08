@@ -1,0 +1,32 @@
+<ion-view view-title="Reclip a Clip">
+    <ion-nav-buttons side="primary">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+        <button class="button clip-add-save" on-tap="reclipClip(reclip, clip.node.ph_bid)">
+            <i class="ion-checkmark"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-content has-header="true" class="padding reclip-content" on-swipe-right="back()">
+        <div class="limit-width">
+            <div class="padding balanced-bg" ng-if="suc_mess"><i class="icon ion-checkmark-circled"></i> {{suc_mess}}</div>
+            <div class="padding assertive-bg" ng-if="err_mess"><i class="icon ion-minus-circled"></i> {{err_mess}}</div>
+            <div class="list">
+                <div class="reclip-image">
+                    <img src="{{image_src}}" id="clipImage" />
+                </div>
+                <label class="item item-input description">
+                    <textarea placeholder="Description" ng-model="reclip.desc" rows="4"></textarea>
+                </label>
+                <ion-toggle ng-if="::user.data.hybridauth.id" ng-model="reclip.send_to_facebook" toggle-class="toggle-calm" ng-true-value="'1'" ng-false-value="'0'">Post to Facebook</ion-toggle>
+                <ion-list class="collection-list">
+                    <ion-item class="title">Add to existing collection</ion-item>
+                    <ion-item ng-class="clip.node.ph_bid == col.bid ? 'active' : ''" ng-repeat="col in collections" class="collection-item" on-tap="setCollection(col.bid, col.name)">{{col.name}}</ion-item>
+                    <ion-item ng-click="reclipClip()" class="add-collection"><i class="icon ion-plus"></i> Add to a new Collection</ion-item>
+                </ion-list>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

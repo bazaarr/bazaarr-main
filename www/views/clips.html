@@ -1,0 +1,41 @@
+<ion-view view-title="{{title}}">
+    <ion-nav-buttons side="primary">
+        <button class="button" ng-click="back()" ng-if="$state.includes('collection') || $state.includes('hashtag')">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+        <button class="button refine" ng-controller="SearchCtrl" ng-if="isSearch()" ng-click="goSearch()">
+            Refine
+        </button>
+        <button class="button" ng-if="!isSearch()" ng-click="$state.go('search')">
+            <i class="ion-search"></i>
+        </button>
+    </ion-nav-buttons>
+
+    <div class="bar bar-dark bar-header item-input-inset search-bar" ng-controller="SearchCtrl" ng-if="$state.current.name == 'search-clips'">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+        <div class="item-input-wrapper item-button-right">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <form>
+                <input name="search" type="search" placeholder="search" ng-model="search.search_api_views_fulltext"
+                       ng-keydown="searchInputKeyPress($event, search)" class="search-top-input"/>
+                <div class="button button-clear" ng-click="resetSearchResults(1)">
+                    <i class="ion-close-round"></i>
+                </div>
+            </form>
+        </div>
+        <div class="right-buttons">
+            <button class="button" ng-click="$state.go('search-refine')">
+                <i class="ion-android-options"></i>
+            </button>
+        </div>
+    </div>
+
+    <ion-content delegate-handle="clipList" has-header="true" has-tabs="true" on-swipe-right="backCondition()"> <!--  on-scroll="onScroll()" -->
+        <ion-refresher on-refresh="doRefresh()"></ion-refresher>
+        <ng-include src="'views/clip/list.html'">
+    </ion-content>
+</ion-view>

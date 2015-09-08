@@ -1,0 +1,8 @@
+<div class="add-web-images">
+    <div class="even wcol">
+        <img ng-repeat="img in imgs" src="{{img}}" width="45%" class="web-image" on-tap="selectWebImage(img)"  ng-if="$even"/>
+    </div>
+    <div class="odd wcol">
+        <img ng-repeat="img in imgs" src="{{img}}" width="45%" class="web-image" on-tap="selectWebImage(img)"  ng-if="$odd"/>
+    </div>
+</div>

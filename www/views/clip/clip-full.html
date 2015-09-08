@@ -1,0 +1,90 @@
+<ion-view view-title="" can-swipe-back="false" ng-class="{'wideClip' : clip.wideClip}">
+    <ion-nav-bar class="bar-dark" ng-class="{'wide-clip' : clip.wideClip}" align-title="left">
+        <ion-nav-buttons side="primary">
+            <button class="button" on-tap="backClip()"> <!--$state.go(back_view)-->
+                <i class="ion-chevron-left"></i>
+            </button>
+        </ion-nav-buttons>
+        <ion-nav-title>
+            <div class="collection-link">
+                <a ng-href="#!/collection/{{clip.collection_id}}" class="collection-title">{{clip.collection_name}}</a>
+            </div>
+        </ion-nav-title>
+        <ion-nav-buttons side="secondary">
+            <button class="button" ng-if="checkBlocked(clip.bloked) && is_app" ng-click="shareClip()">
+                <i class="ion-share"></i>
+            </button>
+            <button class="button" ng-click="$state.go('recent')">
+                <i class="ion-home"></i>
+            </button>
+            <button class="button" ng-click="openPopover($event)">
+                <i class="ion-navicon-round"></i>
+            </button>
+        </ion-nav-buttons>
+    </ion-nav-bar>
+
+    <ion-content class="padding clip-view" scroll="true" has-bouncing="false" has-header="true" delegate-handle="clipSingle"
+                 on-swipe-right="backClip()">
+        <div>
+            <div class="clip article full">
+                <div class="image" ng-click="goFeed()">
+                    <img ng-src="{{clip.img_large}}">
+                </div>
+                <div class="text-wrapper">
+                    <div class="title">{{clip.title}}</div>
+                    <div class="info">
+                        <span>{{clip.created}}</span>
+                        <span ng-if="clip.owner.sub_name"> - By <a href="#!/account/{{clip.owner.sub_uid}}/collections">{{clip.owner.sub_name}}</a></span>
+                    </div>
+                    <div class="text"><span class="text-inner" ng-bind-html="clip.desc"></span></div>
+                </div>
+                <div class="bottom-wrapper">
+                    <div class="desc-price">
+                        <div class="desc-category-wrapper">
+                            <div class="category-link" ng-if="clip.random_hashtag">
+                                <a href="#!/hashtag/{{clip.random_hashtag}}" class="category-title">#{{clip.random_hashtag}}</a>
+                            </div>
+                        </div>
+                        <div class="price-wrapper">
+                            <div ng-if="clip.price > 0" class="price">
+                                {{clip.currency.code == 'USD' ? clip.currency.symbol : ''}}{{clip.price}} {{clip.currency.code}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="line-bottom"></div>
+                    <div class="owner-actions">
+                        <div class="owner-wrapper">
+                            <div class="owner">
+                                <a ng-href="#!/account/{{clip.owner.id}}/collections"><img ng-src="{{clip.owner.img}}" width="60"/></a>
+                                <div class="links">
+                                    <a ng-href="#!/account/{{clip.owner.id}}/collections">{{clip.owner.name}}</a>
+                                    <div class="user-followers">{{clip.owner.followers_count || 0}} follower{{clip.owner.followers_count == 1 ? '' : 's'}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="actions-bottom">
+                            <div ng-if="clip.bloked !== 0 && canReclip()" ng-click="clipActionReclip(clip.nid)">
+                                <i class="ion-scissors"></i>
+                                <div class="counter">{{clip.reclips_count || 0}} reclip{{clip.reclips_count == 1 ? '' : 's'}}</div>
+                            </div>
+                            <div class="middle-dot">.</div>
+                            <div ng-if="!clip.voted && checkBlocked(clip.bloked)" ng-click="clipActionLike()">
+                                <i class="ion-heart"></i>
+                                <div class="counter">{{clip.like_count || 0}} like{{clip.like_count == 1 ? '' : 's'}}</div>
+                            </div>
+                            <div ng-if="clip.voted && checkBlocked(clip.bloked)" ng-click="clipActionLike()" class="liked">
+                                <i class="ion-heart"></i>
+                                <div class="counter">{{clip.like_count || 0}} like{{clip.like_count == 1 ? '' : 's'}}</div>
+                            </div>
+                            <div class="middle-dot">.</div>
+                            <a href="#!/comments/{{clip.nid}}">
+                                <i class="ion-chatbox"></i>
+                                <div class="counter">{{clip.comment_count || 0}} note{{clip.comment_count == 1 ? '' : 's'}}</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,32 @@
+<ion-view class="page-about" view-title="Claim Account">
+    <ion-nav-buttons side="primary">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary"></ion-nav-buttons>
+    <ion-content has-header="true" class="padding limit-width" on-swipe-right="back()">
+        <div class="item-input-wrapper item-button-right">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <form>
+                <input name="search" type="search" placeholder="Search" ng-model="search"
+                       ng-keydown="searchInputKeyPress($event, search)" class="search-top-input"/>
+            </form>
+        </div>
+        <div>
+            <ion-list class="users-list">
+                <ion-item ng-repeat="user in users">
+                    <div class="row row-center">
+                        <div class="col col-25 text-center image" on-tap="$state.go('account.collections', {'userId' : user.uid})">
+                            <img src="{{user.img.small}}" width="60px" />
+                        </div>
+                        <div class="col">
+                            <div class="name" on-tap="$state.go('account.collections', {'userId' : user.uid})">{{user.name}}</div>
+                            <div on-tap="goToClaim(user.uid, user.claim)" class="info">{{user.claim=='1' ? 'Already claimed' : 'Claim'}}</div>
+                        </div>
+                    </div>
+                </ion-item>
+            </ion-list>
+        </div>
+    </ion-content>
+</ion-view>

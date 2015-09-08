@@ -1,0 +1,7 @@
+<ul class="popup-select">
+    <li ng-click="popupSelectClick('search.price', [0,0], 'All'); selectType(0, '', '')">All</li>
+    <li ng-click="popupSelectClick('search.price', [0.01,100], 'Less than $100'); selectType(2, 0.01, 100)">Less than $100</li>
+    <li ng-click="popupSelectClick('search.price', [0.01,500], 'Less than $500'); selectType(2, 0.01, 500)">Less than $500</li>
+    <li ng-click="popupSelectClick('search.price', [0.01,1000], 'Less than $1000'); selectType(2, 0.01, 1000)">Less than $1000</li>
+    <li ng-click="popupSelectClick('search.price', [1000,0], '$1000+'); selectType(2, 1000, '')">$1000+</li>
+</ul>

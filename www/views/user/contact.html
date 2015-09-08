@@ -1,0 +1,13 @@
+<ion-list class="users-contact limit-width">
+    <div class="padding balanced-bg" ng-if="suc_mess"><i class="icon ion-checkmark-circled"></i> {{suc_mess}}</div>
+    <div class="padding assertive-bg" ng-if="err_mess"><i class="icon ion-minus-circled"></i> {{err_mess}}</div>
+    <div class="item-input">
+        <input placeholder="Subject" type="text" ng-model="contact.subject">
+    </div>
+    <div class="item-input">
+        <textarea placeholder="Message" ng-model="contact.message"></textarea>
+    </div>
+    <div class="item-input">
+        <button class="button calm-bg button-full" ng-click="sendMessage(contact)">Send message</button>
+    </div>
+</ion-list>

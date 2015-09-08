@@ -1,0 +1,27 @@
+<ion-list class="users-about">
+    <ion-item class="form-item">
+        <ion-item ng-if="account.website">
+            <div class="row">
+                <div class="col label">{{account.about}}</div>
+            </div>
+        </ion-item>
+        <ion-item ng-if="account.location">
+            <div class="row">
+                <div class="col label">{{account.location}}</div>
+                <div class="col col-10 text-right"><span class="ico-wrap"><i class="ion-ios-location"></i></span></div>
+            </div>
+        </ion-item>
+        <ion-item ng-if="account.fb">
+            <div class="row">
+                <div class="col label">{{account.fb}}</div>
+                <div class="col col-10 text-right"><span class="ico-wrap"><i class="ion-social-facebook"></i></span></div>
+            </div>
+        </ion-item>
+        <ion-item ng-if="account.website">
+            <div class="row">
+                <div class="col label"><a ng-click="openInApp(account.website)">{{account.website}}</a></div>
+                <div class="col col-10 text-right"><span class="ico-wrap"><i class="ion-android-globe"></i></span></div>
+            </div>
+        </ion-item>
+    </ion-item>
+</ion-list>

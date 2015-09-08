@@ -1,0 +1,77 @@
+<div ng-if='collection' class="clip-list-subtitle">
+    <div class="row collection-panel">
+        <div class="col clips-count">
+            {{collection.clips_count}} clips
+        </div>
+        <div ng-if="user.uid && user.uid == collection.uid" class="col actions">
+            <button on-tap="addClipFromCollection(collection)">
+                <i class="ion-plus-round"></i>
+            </button>
+            <button on-tap="goEditCollection(collection.bid)">
+                <i class="ion-edit"></i>
+            </button>
+        </div>
+        <div class="edit-btn" ng-if="user.uid && user.uid != collection.uid">
+            <button class="button button-block button-calm"
+                    ng-click="followCollection(collection.bid, collection.follow)">
+                <div ng-if="collection.follow">
+                    <i class="ion-minus-round"></i> Unfollow
+                </div>
+                <div ng-if="!collection.follow">
+                    <i class="ion-plus-round"></i> Follow
+                </div>
+            </button>
+            <button class="button button-block button-calm" ng-if="collection.uid!=user.uid && collection.accepted=='0'" ng-click="accept_collection(collection, 1)">
+                <div ng-if="collection.accepted=='0'">
+                    Accept
+                </div>
+            </button>
+            <button class="button button-block button-calm" ng-if="collection.uid!=user.uid && (collection.accepted=='0'||collection.accepted=='1')" ng-click="accept_collection(collection, collection.accepted=='1' ? 3 : 0)">
+                <div ng-if="collection.accepted=='0'">
+                    Decline
+                </div>
+                <div ng-if="collection.accepted=='1'">
+                    Remove
+                </div>
+            </button>
+        </div>
+    </div>
+    <div class="row" ng-if="collection.description">
+        <div class="col">
+            {{collection.description}}
+        </div>
+    </div>
+</div>
+<div ng-style="{'height' : block_height + 'px'}"></div>
+<div class="row clips-list">
+    <div class="col" ng-repeat="clip in clips">
+        <div class="clip-teaser" ng-repeat="cli in clip" id="clip-{{cli.nid}}" on-hold="onHold(cli)">
+            <a href="#!/clip/{{cli.nid}}" ng-class="getBlockedClass(cli.bloked)" class="clip_img"
+                 ng-style="{'min-height': cli.wrap_h + 'px', 'background-color': '#' + cli.color[0].hex}">
+                <img ng-src="{{cli.list_img}}" width="100%" />
+                <div ng-if="cli.price > 0" class="price">
+                    {{cli.currency.code == 'USD' ? cli.currency.symbol : ''}}{{cli.price}} {{cli.currency.code}}
+                </div>
+                <div ng-if="::cli.is_video" class="video"><div class="video-icon"></div></div>
+            </a>
+            <a href="#!/account/{{cli.owner.id}}/collections" class="row clip_bottom row-center" ng-style="{'height': '40px', 'overflow' : 'hidden'}">
+                <div class="col col-33 user-pic">
+                    <img ng-src="{{cli.owner.img}}" width="100%" />
+                </div>
+                <div class="col clipper">
+                    <div class="u-name">
+                        {{cli.owner.name}}
+                        <span ng-if="cli.owner.sub_text">
+                            {{cli.owner.sub_text}}
+                            {{cli.owner.sub_name}}
+                        </span>
+                    </div>
+                    <div class="c-name">
+                        {{cli.owner.coll_name}}
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+<ion-infinite-scroll ng-if="is_load_more" on-infinite="loadMore()" distance="25%"></ion-infinite-scroll>

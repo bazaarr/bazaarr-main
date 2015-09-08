@@ -1,0 +1,5 @@
+<ul class="popup-select">
+    <li ng-repeat="cur in allCurrency"
+        ng-class="{'active' : clip.node.currency == cur.code}"
+        ng-click="popupSelectClick('clip.node.currency', cur.code, cur.code)">{{cur.name}}</li>
+</ul>

@@ -1,0 +1,12 @@
+<ion-list>
+    <ion-item ng-click="addPhoto(1)">
+        Camera
+    </ion-item>
+    <ion-item ng-click="addPhoto(2)">
+        Gallery
+    </ion-item>
+    <ion-item ng-if="$state.includes('add')" ng-click="openUrlPopup()">
+        Web
+    </ion-item>
+    <button class="popup-close-button" ng-click="closeImagePopup()">Cancel</button>
+</ion-list>

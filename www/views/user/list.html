@@ -1,0 +1,26 @@
+<ion-view view-title='{{title}}'>
+    <ion-nav-buttons side="primary">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+        
+    </ion-nav-buttons>
+
+    <ion-content has-header="true" has-tabs="true" on-swipe-right="back()">
+        <ion-list class="users-list">
+            <ion-item ng-repeat="user in users">
+                <div class="row row-center">
+                    <div class="col col-25 text-center" on-tap="$state.go('account.collections', {'userId' : user.uid})">
+                        <img ng-src="{{user.img.small}}" width="60px" />
+                    </div>
+                    <div class="col">
+                        <div class="name" on-tap="$state.go('account.collections', {'userId' : user.uid})">{{user.name}}</div>
+                        <div on-tap="$state.go('collection', {'colId' : user.collection_id})">{{user.collection_name}}</div>
+                    </div>
+                </div>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

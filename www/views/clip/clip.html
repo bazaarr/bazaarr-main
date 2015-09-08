@@ -1,0 +1,87 @@
+<ion-view view-title="">
+    <ion-nav-buttons side="primary">
+        <button class="button" on-tap="backClip()"> <!--$state.go(back_view)-->
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+        <button class="button" ng-if="clip.bloked !== 0 && is_app" ng-click="shareClip()">
+            <i class="ion-share"></i>
+        </button>
+        <button class="button" ng-if="clip.bloked !== 0 && canReclip()" ng-click="clipActionReclip()">
+            <i class="ion-scissors"></i>
+        </button>
+        <button class="button action-like" ng-click="clipActionEdit()" ng-if="isOwner()">
+            <i class="ion-edit"></i>
+        </button>
+        <button class="button action-like" ng-if="clip.bloked !== 0" ng-click="clipActionLike()">
+            <i class="ion-heart liked" ng-if="clip.voted"></i>
+            <i class="ion-heart" ng-if="!clip.voted"></i>
+        </button>
+        <button class="button" ng-if="!isOwner() && !clip.shared_collection" ng-click="openPopover($event)">
+            <i class="ion-android-more-vertical"></i>
+        </button>
+    </ion-nav-buttons>
+
+    <ion-content class="padding clip-full" has-header="true" has-tabs="true" delegate-handle="clipSingle">
+        <!--ion-slide-box ng-if="slide" on-slide-changed="clipChange($index)" show-pager="false" active-slide="slider.index">
+            <ion-slide ng-repeat="clip in slider.clips">
+                <ng-include src="'views/clip/single.html'"></ng-include>
+            </ion-slide>
+        </ion-slide-box>
+        <div ng-if="!slide">
+            <ng-include ng-controller="SingleClipCtrl" src="'views/clip/single.html'"></ng-include>
+        </div-->
+        <div class="clip limit-width" on-swipe-up="nextSlide()"  on-swipe-down="prevSlide()">
+            <div class="image-wrapper">
+                <div class="image" ng-class="clip.bloked === 0 ? 'block' : ''">
+                    <div on-tap="openInApp(clip.source_url, false, clip.is_video)">
+                        <img ng-src="{{clip.img_large}}" width="100%" />
+                    </div>
+                    <div ng-if="clip.price > 0" class="price">
+                        {{clip.currency.code == 'USD' ? clip.currency.symbol : ''}}{{clip.price}} {{clip.currency.code}}
+                    </div>
+                    <div on-tap="openInApp(clip.source_url, false, clip.is_video)" ng-if="clip.is_video" class="video"><div class="video-icon"></div></div>
+                    <div ng-if="isList() && checkSlide(-1)" class="nav-button left" ng-click="prevSlide()"><i class="ion-chevron-left"></i></div>
+                    <div ng-if="isList() && checkSlide(1)" class="nav-button right" ng-click="nextSlide()"><i class="ion-chevron-right"></i></div>
+                </div>
+            </div>
+            <div ng-if="clip.source_url">
+                <span class="subtitle">Found on </span>
+                <a href="#" on-tap="openInApp(clip.source_url, false, clip.is_video)">{{clip.source_domain}}</a>
+            </div>
+            <div class="description" ng-bind-html="clip.desc"></div>
+            <div class="sep-line"></div>
+            <div class="row clipped-info">
+                <div class="col text">
+                    <span class="subtitle">Clipper:</span><br />
+                    <a ng-href="#!/account/{{clip.owner.id}}/collections">{{clip.owner.name}}</a>
+                </div>
+                <div class="col col-20 image">
+                    <img src="{{clip.owner.img}}" width="60" />
+                </div>
+            </div>
+            <div class="sep-line"></div>
+            <div class="row clipped-info coll">
+                <div class="col text">
+                    <span class="subtitle">Collection:</span><br />
+                    <a ng-href="#!/collection/{{clip.collection_id}}">{{clip.collection_name}}</a>
+                </div>
+            </div>
+            <div class="sep-line"></div>
+            <div class="row">
+                <div class="col">
+                    <a ng-hide="clip.bloked === 0" ng-href="#!/comments/{{clip.nid}}">
+                        <span ng-if='clip.comment_count'>{{clip.comment_count}} comment{{clip.comment_count == 1 ? '' : 's'}}</span>
+                        <span ng-if='!clip.comment_count'>Add your comment</span>
+                    </a>
+                </div>
+                <div class="col text-right stats">
+                    <i class="ion-heart"></i> {{clip.like_count || 0}}
+                    <i class="ion-scissors"></i> {{clip.reclips_count || 0}}
+                </div>
+            </div>
+            <!--br /><br /><br /-->
+        </div>
+    </ion-content>
+</ion-view>

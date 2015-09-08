@@ -1,0 +1,16 @@
+<ion-popover-view class="custom-popover" ng-controller="UserCtrl">
+    <ion-list>
+        <ion-item ng-click="goUserMenu('account.contact', {userId: account.uid})">
+            Contact
+        </ion-item>
+        <ion-item ng-if="!account.is_follow" ng-click="followUser(account.is_follow)">
+            Follow
+        </ion-item>
+        <ion-item ng-if="account.is_follow" ng-click="followUser(account.is_follow)">
+            Unfollow
+        </ion-item>
+        <ion-item ng-click="goUserMenu('account.about', {userId: account.uid})">
+            About
+        </ion-item>
+    </ion-list>
+</ion-popover-view>

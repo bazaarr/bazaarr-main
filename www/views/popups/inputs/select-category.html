@@ -1,0 +1,6 @@
+<ul class="popup-select">
+    <li ng-class="{'active' : tid == '_none'}" ng-click="popupCategorySelect('_none', 'None')">None</li>
+    <li ng-repeat="cat in categories"
+        ng-class="{'active' : tid == cat.tid}"
+        ng-click="popupCategorySelect(cat.tid, cat.name)">{{cat.name}}</li>
+</ul>
