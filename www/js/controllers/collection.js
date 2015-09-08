@@ -241,6 +241,12 @@ CollectionService, FollowService, AccountService, ToastService, HttpService, col
             parent_index    = this.$parent.$parent.$parent.$parent.$index,
             bid             = coll.bid;
 
+        if(type == 3) {
+            if(!confirm('Are you sure you want to remove this collection?')){
+                return;
+            }
+        }
+
         CollectionService.accept_collection(bid, type).then(function(data){
             HttpService.addNoCache("get_user_collections/" + $rootScope.user.uid);
             if(type == 0 || type == 3){
@@ -700,6 +706,11 @@ angular.module('bazaarr').controller('InputCtrl', function($scope, $rootScope, $
         }
         if(type == 'select-color') {
             var default_buttons = [{
+                text: 'Clear',
+                onTap: function(){
+                    $scope.search.colors_hex = '';
+                }
+            }, {
                 text: 'Select'
             }]
         } else if(type == 'full-text') {
@@ -730,7 +741,6 @@ angular.module('bazaarr').controller('InputCtrl', function($scope, $rootScope, $
                             e.preventDefault();
                             return false;
                         }
-                        p(scope_var);
                         scope_var = scope_var.split(".");
                         if(typeof scope_var[2] != 'undefined'){
                             if(typeof $scope[scope_var[0]][scope_var[1]] == 'undefined') {

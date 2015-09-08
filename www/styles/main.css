@@ -506,6 +506,10 @@ body {
     background: none;
     color: #fff;
     font-size: 12px;
+    padding: 0;
+    min-width: 0;
+    width: 46%;
+    display: inline-block;
 }
 
 .buttons-switch {
@@ -3036,8 +3040,20 @@ body[class*="following-collections"] .buttons-switch .col .button.active {
     width: 60px;
     max-width: 60px;
 }
-.search-all .name {
+.search-all .name,
+.search-all .info {
     color: #333;
+}
+.search-all .title {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    word-break: break-word;
+    white-space: normal;
+    color: #A9A9A9;
+}
+.search-all .item .row-center {
+    align-items: flex-start;
 }
 .search-all .item {
     padding: 0;

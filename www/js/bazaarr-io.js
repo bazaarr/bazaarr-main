@@ -601,10 +601,10 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
 $cordovaInAppBrowser, $cordovaStatusbar, $cordovaAppVersion, localStorageService, DeviceAdapterService, MenuService, 
 UserService, AccountService, CollectionService, ConfigService, HttpService, ClipsService, StateService, MetaService) {
     $rootScope.is_app = false;
-    document.addEventListener("deviceready", function() {
-        DeviceAdapterService.is_ready = false;
-        $rootScope.is_app = false;
-/*
+        document.addEventListener("deviceready", function() {
+        DeviceAdapterService.is_ready = true;
+        $rootScope.is_app = true;
+        
         $cordovaStatusbar.overlaysWebView(true);
         $cordovaStatusbar.style(1);
 
@@ -622,9 +622,9 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
             }
             localStorageService.set("version", current_version);
         });
-*/
+        
     }, false);
-    
+
     $rootScope.config = {
         screenHeight : window.innerHeight - 100
     };
@@ -643,7 +643,31 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
         $rootScope.active          = [];
         $rootScope.active[index]   = "active";
 
+        /*if ("search" === fromState.name.substring(0, 6)
+                && "search" !== toState.name.substring(0, 6)) {
+            SearchService.params = {};
+        }*/
+
         $ionicScrollDelegate.resize();
+        //!$rootScope.backEvent &&
+        //var history = $ionicHistory.viewHistory();
+
+        /*if (history.currentView) {
+            if (fromState.name.indexOf("account") === 0 && toState.name.indexOf("account") === 0
+                && fromParams.userId === toParams.userId) {
+                history.currentView.stateId = history.currentView.stateId.replace(fromState.name, toState.name);
+                history.currentView.stateName = toState.name;
+                history.currentView.url = history.currentView.url.replace(fromState.url, toState.url);
+                //$rootScope.backState.push({'state' : fromState.name, 'params' : fromParams});
+            }
+            if (fromState.name !== "clip" && toState.name === "clip") {
+                p(history);
+                $timeout(function() {
+                    p(history);
+                });
+            }
+        }*/
+
 
         /*
          * if next state equals back state, remove back state from history, to return to previous level #BA-1622
@@ -665,14 +689,14 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
                 && fromState.name !== "login"
                 && !(fromState.name.indexOf("account") === 0 && toState.name.indexOf("account") === 0
                     && fromParams.userId === toParams.userId)) {
-            $rootScope.backState.push({'state' : fromState.name, 'params' : fromParams});
+            $rootScope.backState.push({'state' : fromState.name, 'params' : fromParams, 'clip_list' : ClipsService.page_api_url});
         }
         
         /* add our own history stack to localstorage, for enable history after browser reload */
         if (fromState.name && $rootScope.backState.length) {
             localStorageService.set("backState", $rootScope.backState);
         }
-        $rootScope.backEvent = false;
+        $rootScope.backEvent    = false;
         
         MetaService.setDefault();
     });
@@ -725,6 +749,7 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
             var back_state = $rootScope.backState.pop();
 
             if (back_state.state) {
+                ClipsService.page_api_url = back_state.clip_list;
                 $state.go(back_state.state, back_state.params);
             } 
             else {

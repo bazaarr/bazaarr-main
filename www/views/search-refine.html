@@ -1,11 +1,11 @@
 <ion-view>
     <div class="bar bar-dark bar-header item-input-inset search-bar">
-        <button class="button" ng-click="back()">
-            <i class="ion-chevron-left"></i>
-        </button>
         <div class="title">
             Refine search
         </div>
+        <button class="button" ng-click="saveFilters()">
+            <i class="ion-checkmark"></i>
+        </button>
     </div>
 
 
@@ -43,7 +43,7 @@
                     <ion-item ng-controller="InputCtrl" ng-click="openPopup('select-color', false, false, 'Color')">
                         <div class="row">
                             <div class="col label">Color</div>
-                            <div class="col value color text-right" style="background-color: #{{search.colors_hex}}"></div>
+                            <div class="col value color text-right" style="background-color: #{{search.colors_hex}}" ng-if="search.colors_hex"></div>
                             <div class="col col-10 text-right"><i class="ion-chevron-right"></i></div>
                         </div>
                     </ion-item>

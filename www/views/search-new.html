@@ -79,16 +79,16 @@
             <!-- Clips list -->
             <ion-list class="collections-list">
                 <ion-item ng-repeat="clip in clips">
-                    <div class="row row-center">
-                        <div class="col text-center image" on-tap="openClip(clip)">
+                    <div class="row row-center" on-tap="openClip(clip)">
+                        <div class="col text-center image">
                             <img ng-src="{{clip.img}}" width="40" />
                         </div>
-                        <div class="col" on-tap="$state.go('account.collections', {'userId' : clip.owner.id})">
-                            <div class="name">
-                                {{clip.owner.name}}
+                        <div class="col">
+                            <div>
+                                <span class="name">{{clip.owner.name}}</span> - <span class="info"><span>{{clip.owner.coll_name}}</span></span>
                             </div>
-                            <div class="info">
-                                <span>{{clip.owner.coll_name}}</span>
+                            <div class="title">
+                                <span>{{clip.title}}</span>
                             </div>
                         </div>
                     </div>

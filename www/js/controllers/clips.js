@@ -227,6 +227,18 @@ p(block_height);
         return false;
     }
 
+    $scope.searchInputKeyPress = function(e, search) {
+        // console.log(e);
+        $timeout(function() {
+            if (e.keyCode == 13 || search.search_api_views_fulltext.length > 1) {
+		SearchService.params = search;
+                SearchService.load().then(function(data) {
+			$scope.clips = ClipsService.prepare(data.data, "", true);
+                });
+            }
+        });
+    };
+
     $scope.$on('orientation:change', function() {
         if (ClipsService.getColsNumber() === ClipsService.size) {
             return false;
@@ -289,7 +301,7 @@ p(block_height);
 });
 
 angular.module('bazaarr').service('ClipsService',
-function($rootScope, $state, $timeout, $location, $ionicLoading, HttpService, AccountService, ArrayService, MetaService, UserService, ToastService) {
+function($rootScope, $state, $timeout, $location, $ionicLoading, HttpService, AccountService, ArrayService, MetaService, UserService) {
     this.pager = {};
 
     this.page_api_url   = "recent";
@@ -352,13 +364,11 @@ function($rootScope, $state, $timeout, $location, $ionicLoading, HttpService, Ac
 
         var promise = HttpService.get();
         var that    = this;
-        promise.then(function(data) {
+        promise.then(function() {
             if (that.account_page) {
                 var account         = AccountService.getAccount();
                 MetaService.set("clips", page, {"name" : account.name});
             }
-        }, function(reason) {
-            ToastService.showMessage("danger", reason.data);
         });
         return promise;
     }

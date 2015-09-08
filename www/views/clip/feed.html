@@ -20,6 +20,7 @@
     <ion-content class="padding" has-header="true" has-tabs="true" on-swipe-right="back()" on-swipe-right="back()">
         <h2>{{feed_html.title}}</h2>
         <div ng-bind-html="feed_html.content"></div>
+        <h4 ng-bind-html="clip.desc"></h4>
         <div class="text-center original-link" on-tap="openInApp(feed_html.url, false, false)">View original source</div>
     </ion-content>
 </ion-view>

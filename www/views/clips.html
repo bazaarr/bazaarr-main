@@ -5,15 +5,12 @@
         </button>
     </ion-nav-buttons>
     <ion-nav-buttons side="secondary">
-        <button class="button refine" ng-controller="SearchCtrl" ng-if="isSearch()" ng-click="goSearch()">
-            Refine
-        </button>
         <button class="button" ng-if="!isSearch()" ng-click="$state.go('search')">
             <i class="ion-search"></i>
         </button>
     </ion-nav-buttons>
 
-    <div class="bar bar-dark bar-header item-input-inset search-bar" ng-controller="SearchCtrl" ng-if="$state.current.name == 'search-clips'">
+    <div class="bar bar-dark bar-header item-input-inset search-bar" ng-if="$state.current.name == 'search-clips'">
         <button class="button" ng-click="back()">
             <i class="ion-chevron-left"></i>
         </button>

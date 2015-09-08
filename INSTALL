@@ -1,0 +1,12 @@
+https://www.airpair.com/javascript/posts/a-year-using-ionic-to-build-hybrid-applications#prerequisite
+
+Plugins:
+ionic plugin add https://github.com/whiteoctober/cordova-plugin-app-version.git
+ionic plugin add org.apache.cordova.statusbar
+ionic plugin add https://github.com/driftyco/ionic-plugins-keyboard.git
+ionic plugin add https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin.git
+ionic plugin add org.apache.cordova.camera
+ionic plugin add https://github.com/phonegap-build/PushPlugin.git
+ionic plugin add org.apache.cordova.device
+ionic plugin add org.apache.cordova.network-information
+ionic plugin add org.apache.cordova.inappbrowser

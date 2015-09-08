@@ -1,6 +1,6 @@
 'use strict';
 angular.module('bazaarr').controller('SearchCtrl',
-function($scope, $rootScope, $state, $timeout, $ionicTabsDelegate, $cordovaKeyboard,
+function($scope, $rootScope, $state, $timeout, $ionicTabsDelegate, $ionicHistory, $cordovaKeyboard,
 SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaService) {
 
     var SEARCH_TAGS_COUNT  = 6,
@@ -121,12 +121,12 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
             SearchService.collectionSearch($scope.search.search_api_views_fulltext).then(function (data) {
                 $scope.collections = data.data;
             });
-        } else if ($state.current.name == 'search-clips') {
+        } /*else if ($state.current.name == 'search-clips') {
             SearchService.params = $scope.search;
             SearchService.load().then(function(data) {
                 $scope.clips = data.data;
             });
-        } else if ($state.current.name == 'search-tags') {
+        }*/ else if ($state.current.name == 'search-tags') {
             SearchService.tagSearch($scope.search.search_api_views_fulltext, 30).then(function(data){
                 if(data.data.length > 0) {
                     for(var i = 0; i < data.data.length; i++) {
@@ -183,12 +183,13 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
                         SearchService.collectionSearch(search.search_api_views_fulltext).then(function(data){
                             $scope.collections = data.data;
                         });
-                    } else if ($state.current.name == 'search-clips') {
+                    } /*else if ($state.current.name == 'search-clips') {
                         SearchService.params = search;
                         SearchService.load().then(function(data) {
-                            $scope.$parent.$parent.clips = data.data;
+                            //$scope.$parent.$parent.clips = data.data;//ClipsService.prepare(data.data);
+                            $scope.clips = data.data;//ClipsService.prepare(data.data);
                         });
-                    } else if ($state.current.name == 'search-tags') {
+                    }*/ else if ($state.current.name == 'search-tags') {
                         SearchService.params = search;
                         SearchService.tagSearch(search.search_api_views_fulltext, 30).then(function(data){
                             if(data.data.length > 0) {
@@ -216,10 +217,9 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
                         $scope.is_load_more = false;
                         SearchService.params = search;
                         SearchService.load().then(function(data) {
-                            $scope.clips = data.data;
+                            $scope.clips = data.data;//ClipsService.prepare(data.data);
                         });
                     }
-
                     $state.go($state.current.name, {query: search.search_api_views_fulltext}, {notify:false, reload:false});
                 } else {
                     ToastService.showMessage("danger", "Please enter 1 or more symbols");
@@ -317,6 +317,15 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
 
         });
     };
+
+    $scope.saveFilters = function() {
+        //$scope.clips = {};
+	$ionicHistory.clearCache();
+	$rootScope.backEvent = true;
+	delete $scope.search.search_api_views_fulltext;
+        angular.extend(SearchService.params, $scope.search);
+        $state.go('search-clips', {query: SearchService.params.search_api_views_fulltext});
+    }
 });
 
 angular.module('bazaarr').service('SearchService',
