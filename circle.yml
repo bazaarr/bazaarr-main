@@ -10,7 +10,8 @@ dependencies:
       - npm install -g gulp
       - bower install
 deployment:
-    branch: master
-    commands:
-      - npm install -g cordova ionic
-      - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
+    staging:
+      branch: master
+      commands:
+        - npm install -g cordova ionic
+        - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
