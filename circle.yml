@@ -1,0 +1,17 @@
+machine:
+  node:
+    version: v0.12.6
+  ruby:
+    version: 2.1.2
+dependencies:
+    cache_directories:
+      - "node_modules"
+#    post:
+      - npm install gulp
+      - bower install
+      - npm install cordova ionic
+deployment:
+    staging:
+      branch: master
+      commands:
+        - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
