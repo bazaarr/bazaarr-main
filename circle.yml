@@ -6,7 +6,7 @@ machine:
 dependencies:
     cache_directories:
       - "node_modules"
-#    post:
+    post:
       - npm install gulp
       - bower install
       - npm install cordova ionic
