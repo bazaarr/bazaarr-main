@@ -7,11 +7,10 @@ dependencies:
     cache_directories:
       - "node_modules"
     post:
-      - npm install gulp
+      - npm install -g gulp
       - bower install
-      - npm install cordova ionic
 deployment:
-    staging:
-      branch: master
-      commands:
-        - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
+    branch: master
+    commands:
+      - npm install -g cordova ionic
+      - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
