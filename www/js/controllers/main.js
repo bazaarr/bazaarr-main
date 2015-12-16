@@ -78,6 +78,9 @@ MenuService, UserService, ToastService, ConfigService, HttpService) {
             $scope.myAccountPopover.show($event);
         }
     };
+    $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+        $scope.closePopover();
+    });
     $scope.closePopover = function() {
         if($scope.myAccountPopover){
             $scope.myAccountPopover.hide();
@@ -158,9 +161,15 @@ MenuService, UserService, ToastService, ConfigService, HttpService) {
         return ionic.Platform.isAndroid();
     }
 
-    $scope.isIOS = function() {
-        return ionic.Platform.isIOS();
-    }
+    $scope.isIOS = function(version) {
+        if(!ionic.Platform.isIOS()){
+            return false;
+        }
+        if(version){
+            return ionic.Platform.version() < version;
+        }
+        return true;
+    };
 
     if(!$scope.isLogin()) {
         $scope.resetInstructions();
@@ -262,8 +271,16 @@ angular.module('bazaarr').service('MenuService', function($ionicScrollDelegate, 
     },
 
     this.getActiveMenu = function(url) {
-        url = url || $location.url();
-        url = url.replace(/\/:(.*)/, "");
+        url = $location.url();
+        
+        if (url.indexOf("account") === -1) {
+            url = url.replace(/\/:(.*)/, "");
+            url = url.replace(/\-.*/, "");
+        }
+        else {
+            url = "collections";
+        }
+        
         var menus = this.get();
 
         for (var i = 0; i < menus.length; i++) {

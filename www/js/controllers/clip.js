@@ -2,6 +2,8 @@
 angular.module('bazaarr').controller('ClipCtrl',
 function($scope, $state, $timeout, $rootScope, $ionicViewSwitcher, $ionicPopover, $ionicPopup, $cordovaSocialSharing,
 ClipsService, ClipService, UserService, FollowService, AccountService, ToastService, StateService, ConfigService, MetaService, clip) {
+    $scope.canReclip = ClipService.canReclip;
+
     /*SliderService.load().then(function(data) {
         if (data.data) {
             $scope.slider       = SliderService.buildNew(data.data);
@@ -368,26 +370,6 @@ ClipsService, ClipService, UserService, FollowService, AccountService, ToastServ
         return false;
     };
 
-    $scope.canReclip = function() {  
-        if ($scope.isOwner()) {
-            return false;
-        }
-        
-        if (parseInt(ClipService.clip.reclip) === 1) {
-            return false;
-        }
-        
-        if (parseInt(ClipService.clip.bloked) === 0) {
-            return false;
-        }
-
-        if (parseInt(ClipService.clip.shared_collection) === 1) {
-            return false;
-        }
-
-        return true;
-    };
-
     $scope.backClip = function() {
         /*var list_view = ClipService.page_list || "recent";// || $scope.clip.page_list;
 
@@ -517,6 +499,12 @@ ClipsService, ClipService, UserService, FollowService, AccountService, ToastServ
         $scope.clipPopover.show($event);
     };
 
+    $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+        if($scope.clipPopover) {
+            $scope.clipPopover.hide();
+        }
+    });
+
     $scope.onHold = function(clip) {
         ClipService.clip    = clip;
         $scope.clip         = ClipService.clip;
@@ -544,9 +532,15 @@ ClipsService, ClipService, UserService, FollowService, AccountService, ToastServ
     };
 
     $scope.clipResize = function(){
-        var containers = document.getElementsByClassName("uname-container");
-        if(containers.length > 0) {
-            var container = containers[1] ? containers[1] : containers[0];
+        var clips = document.getElementsByClassName("clip-view");
+        if(clips.length > 0) {
+            var clip = clips[1] ? clips[1] : clips[0];
+            if(clip.getElementsByClassName('clip-v')[0].offsetParent) {
+                var cv = clip.getElementsByClassName('clip-v')[0];
+            } else {
+                var cv = clip.getElementsByClassName('clip-h')[0];
+            }
+            var container = cv.getElementsByClassName("uname-container")[0];
             var name = container.getElementsByClassName("resizable-text")[0];
             var containerChildren = container.children;
             var containerWidth = container.offsetWidth;
@@ -613,7 +607,7 @@ ClipsService, ClipService, UserService, FollowService, AccountService, ToastServ
 });
 
 angular.module('bazaarr').controller('CommentCtrl',
-function($scope, $state, $ionicPopup, $ionicLoading, 
+function($scope, $state, $timeout, $ionicPopup, $ionicLoading, 
 CommentService, UserService, ClipService, ToastService, ClipsService, comments, reclip_users, like_users) {
     $scope.comments                 = comments.data;
     $scope.reclip_users             = reclip_users.data;
@@ -674,75 +668,90 @@ CommentService, UserService, ClipService, ToastService, ClipsService, comments, 
     };
 
     $scope.openEditPopup = function() {
-        $scope.comment = CommentService.comment;
-        $scope.comment_edit_popup = $ionicPopup.show({
-            title: 'Edit comment',
-            templateUrl: 'views/popups/inputs/comment-edit.html',
-            buttons: [
-                {
-                    text: 'Cancel'
-                },
-                {
-                    text: 'Save',
-                    onTap: function(e) {
-                        CommentService.save().then(function(data){
-                            $scope.comments[CommentService.comment.index].body_value = $scope.comment.body_value;
-                        }, function(reason) {
-                            ToastService.showMessage("danger", reason.data);
-                        });
-                    }
-                }
-            ],
-            scope: $scope
-        });
-
         $scope.closeActionsPopup();
+
+        $timeout(function() {
+            $scope.comment = CommentService.comment;
+            $scope.comment_edit_popup = $ionicPopup.show({
+                title: 'Edit comment',
+                templateUrl: 'views/popups/inputs/comment-edit.html',
+                buttons: [
+                    {
+                        text: 'Cancel'
+                    },
+                    {
+                        text: 'Save',
+                        onTap: function(e) {
+                            CommentService.save().then(function(data){
+                                $scope.comments[CommentService.comment.index].body_value = $scope.comment.body_value;
+                            }, function(reason) {
+                                ToastService.showMessage("danger", reason.data);
+                            });
+                        }
+                    }
+                ],
+                scope: $scope
+            });
+        });
     };
 
     $scope.deleteComment = function() {
-        var confirmPopup = $ionicPopup.confirm({
-            title: 'Delete comment',
-            template: '<div class="delete-text">Are you sure you want to delete this comment?</div>'
-        });
-        confirmPopup.then(function(res) {
-            if (res) {
-                CommentService.delete().then(function(data){
-                    ClipService.clip.comment_count--;
-                    $scope.comments.splice(CommentService.comment.index, 1);
-                    ToastService.showMessage("success", "Comment successfully deleted!");
-                },
-                function(reason) {
-                    ToastService.showMessage("danger", reason.data);
-                });
-            }
-        });
-
         $scope.closeActionsPopup();
+
+        $timeout(function() {
+            var confirmPopup = $ionicPopup.confirm({
+                title: 'Delete comment',
+                template: '<div class="delete-text">Are you sure you want to delete this comment?</div>'
+            });
+            confirmPopup.then(function(res) {
+                if (res) {
+                    CommentService.delete().then(function(data){
+                        ClipService.clip.comment_count--;
+                        $scope.comments.splice(CommentService.comment.index, 1);
+                        ToastService.showMessage("success", "Comment successfully deleted!");
+                    },
+                    function(reason) {
+                        ToastService.showMessage("danger", reason.data);
+                    });
+                }
+            });
+        });
     };
 
     $scope.closeActionsPopup = function() {
         $scope.comment_actions_popup.close();
     };
 
-    $scope.textareaLimit = function(textarea, rows, chars) {
+    $scope.textareaLimit = function(type, rows, chars) {
+        var obj;
+        if(type == 1) {
+            obj = $scope.new_comment;
+        } else if(type == 2) {
+            obj = $scope.comment;
+        } else {
+            return;
+        }
         var newValue;
-        if($scope.new_comment.body_value){
-            var valueSegments = $scope.new_comment.body_value.split('\n');
+        if(obj.body_value){
+            var valueSegments = obj.body_value.split('\n');
             if(rows != undefined && valueSegments.length > rows) { // too many rows
                 newValue = valueSegments.slice(0, rows).join("\n");
             }
-            if(chars != undefined && $scope.new_comment.body_value.length > chars) { // too many chars
+            if(chars != undefined && obj.body_value.length > chars) { // too many chars
                 if(newValue != undefined)
                     newValue = newValue.substring(0, chars);
                 else
-                    newValue = $scope.new_comment.body_value.substring(0, chars);
+                    newValue = obj.body_value.substring(0, chars);
             }
-            if(newValue != undefined) $scope.new_comment.body_value = newValue;
+            if(newValue != undefined) obj.body_value = newValue;
         }
     }
 });
 
 angular.module('bazaarr').controller('FeedCtrl', function($scope, $state, ClipService, feed) {
+    $scope.canReclip = ClipService.canReclip;
+    $scope.clip      = ClipService.clip;
+
     if ($state.includes("ebay")) {
         if(feed.data.ConditionDescription) {
             feed.data.ConditionDescriptionShort = new CutString(feed.data.ConditionDescription, 60).cut();
@@ -751,12 +760,11 @@ angular.module('bazaarr').controller('FeedCtrl', function($scope, $state, ClipSe
         }
         feed.data.isSinglePic = typeof feed.data.PictureURL == 'string';
         $scope.product = feed.data;
-        console.log($scope.product);
+        //console.log($scope.product);
     }
     else {
         $scope.feed_html = feed.data;
     }
-    $scope.clip      = ClipService.clip;
 
     $scope.$on("clip:load", function() {
         $scope.clip = ClipService.clip;
@@ -811,18 +819,34 @@ angular.module('bazaarr').service('CommentService', function($q, HttpService) {
 
         HttpService.view_url    = "comment";
         HttpService.params      = comment;
-        return HttpService.post();
+        var promise = HttpService.post();
+        promise.then(function() {
+            HttpService.clearHttpCache("comments");
+        });
+
+        return promise;
     };
 
     this.save = function() {
         HttpService.view_url    = "comment/" + this.comment.cid;
         HttpService.params      = {"data" : this.comment};
-        return HttpService.put();
+
+        var promise = HttpService.put();
+        promise.then(function() {
+            HttpService.clearHttpCache("comments");
+        });
+
+        return promise;
     };
 
     this.delete = function() {
         HttpService.view_url    = "comment/" + this.comment.cid;
-        return HttpService.delete();
+        var promise = HttpService.delete();
+        promise.then(function() {
+            HttpService.clearHttpCache("comments");
+        });
+
+        return promise;
     };
 });
 
@@ -831,7 +855,8 @@ function($scope, $state, $timeout, $ionicScrollDelegate, ClipService, ClipsServi
 
 });
 
-angular.module('bazaarr').service('ClipService', function($q, $ionicLoading, $state, HttpService, ClipsService, SearchService) {
+angular.module('bazaarr').service('ClipService', 
+function($q, $ionicLoading, $state, HttpService, ClipsService, SearchService, CollectionService, UserService, ToastService) {
     this.clip = {};
     this.load_from_server = false;
     /*this.load = function(id) {
@@ -842,11 +867,13 @@ angular.module('bazaarr').service('ClipService', function($q, $ionicLoading, $st
     };*/
 
     this.load = function(id) {
-
         $state.params.clipId = id;
         var clip = this.getClip();
-        
+
         if (clip.nid && !this.load_from_server) {
+            if (this.isPrivate(clip)) {
+                return $q.reject();
+            }
             this.clip    = clip;
             return $q.when({"data": [clip]});
         }
@@ -855,18 +882,20 @@ angular.module('bazaarr').service('ClipService', function($q, $ionicLoading, $st
         HttpService.view_url    = "recent";
         HttpService.params      = {"nid" : id};
         HttpService.is_auth     = false;
-        var promise = HttpService.get();
         var that    = this;
 
         //TODO: promise preloader
         this.page_list = this.page_api_url;
         this.preloadImage(clip.img_large);
 
-        promise.then(function(data){
+        return HttpService.get().then(function(data){
+            if (that.isPrivate(data.data[0])) {
+                return $q.reject();
+            }
             that.clip = ClipsService.preRenderSingle(data.data[0]);
-        });
 
-        return promise;
+            return data;
+        });
     };
 
     this.nodeLoad = function(nid) {
@@ -878,12 +907,13 @@ angular.module('bazaarr').service('ClipService', function($q, $ionicLoading, $st
 
     this.likeClip = function(clip) {
         //$ionicLoading.show();
-        HttpService.addNoCache("likes");
-
         HttpService.view_url = "vote/" + clip.nid;
         var promise = HttpService.put();
 
         promise.then(function() {
+            CollectionService.updateCollectionField(clip.collection_id, "count_likes", clip.voted, "increment");
+            HttpService.clearHttpCache("likes", "collection-likes", "users-liked-clips");
+            
             $ionicLoading.hide();
         });
 
@@ -906,7 +936,13 @@ angular.module('bazaarr').service('ClipService', function($q, $ionicLoading, $st
             block: typeof this.clip.bloked === 'undefined' ? 1 : this.clip.bloked
         };
 
-        return HttpService.post();
+        var promise = HttpService.post();
+        var that    = this;
+        promise.then(function(data) {
+            CollectionService.updateCollectionField(that.clip.collection_id, "last_clip_id", data.data.last_clip_id, "update");
+        });
+        
+        return promise;
     };
 
     this.loadMore = function() {
@@ -963,6 +999,38 @@ angular.module('bazaarr').service('ClipService', function($q, $ionicLoading, $st
         i.onload = function(){
 
         };
+    };
+
+    this.canReclip = function() {
+        if (!Object.keys(this.clip).length) {
+            return false;
+        }
+        
+        if (this.clip.owner.id === UserService.user.uid) {
+            return false;
+        }
+        
+        if (parseInt(this.clip.reclip) === 1) {
+            return false;
+        }
+        
+        if (parseInt(this.clip.bloked) === 0) {
+            return false;
+        }
+
+        if (parseInt(this.clip.shared_collection) === 1) {
+            return false;
+        }
+
+        return true;
+    };
+
+    this.isPrivate = function(clip) {
+        if (angular.isDefined(clip.is_private) && parseInt(clip.is_private) === 1) {
+            ToastService.showMessage("danger", "This is a private content. You have no access to view it.");
+            return true;
+        }
+        return false;
     };
 });
 

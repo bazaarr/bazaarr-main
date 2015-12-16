@@ -19,13 +19,14 @@
             <i class="ion-plus-round"></i>
         </button>
     </ion-nav-buttons>
-    <ion-content scroll="false" has-header="true" has-tabs="true" ng-class="!isMyAccount() ? 'not-my-acc' : 'my-acc'">
+    <ion-content delegate-handle="clipList" on-scroll="onScroll()" scroll="true" has-header="true" has-tabs="true" ng-class="!isMyAccount() ? 'not-my-acc' : 'my-acc'"  on-swipe-right="accountBack(isMyAccount())">
+        <ion-refresher on-refresh="doRefresh()"></ion-refresher>
         <div class="user-page-wrapper" ng-class="{'full-desc' : isDescOpen}">
             <div class="user-info-wrapper">
                 <div class="location" ng-if="account.website" ng-click="openInApp(account.website, false, false)"><i class="ion-ios-world-outline"></i>{{account.website}}</div>
-                <div class="location" ng-if="account.location"><i class="ion-location"></i>{{account.location}}</div>
+                <div class="location" ng-if="account.location" ng-click="openOnMap(account.location)"><i class="ion-location"></i>{{account.location}}</div>
                 <div ng-if="!isDescOpen" class="user-about" on-tap="toggleUserDesc(true)" ng-bind-html="account.about_short"></div>
-                <div ng-if="isDescOpen" class="user-about" on-tap="toggleUserDesc(false)">{{account.about}}</div>
+                <div ng-if="isDescOpen" class="user-about" on-tap="toggleUserDesc(false)">{{account.about}} <span class="expand">(Hide...)</span></div>
                 <div class="row user-menu text-center">
                     <a href="#!/account/{{account.uid}}/collections" class="col" ng-class="getUserMenuActive('collections')">
                         <span>{{account.collections_count}}</span><br />
@@ -43,7 +44,7 @@
                         <span>{{account.followers_count}}</span><br />
                         <div>Follower{{account.followers_count == 1 ? '' : 's'}}</div>
                     </a>
-                    <a href="#!/account/{{account.uid}}/following-users" class="col" ng-class="getUserMenuActive(['following-users', 'following-collections'])">
+                    <a href="#!/account/{{account.uid}}/following-users" class="col" ng-class="getUserMenuActive(['following-users', 'following-collections', 'following-hashtags'])">
                         <span>{{account.following_count}}</span><br />
                         <div>Following</div>
                     </a>

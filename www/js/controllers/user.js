@@ -176,9 +176,14 @@ UserService, AccountService, DeviceAdapterService, ToastService, StateService, H
 
     $scope.checkPass  = function(pass){
         $scope.pass.is_valid = false;
+        if(!pass.current_password && !UserService.user.forgot_password){
+            $scope.pass.mess = 'Enter current password';
+            return 'error';
+        }
+
         if(!pass.password){
-            $scope.pass.mess = ''; //Please set your password
-            return '';
+            $scope.pass.mess = 'Please set your password';
+            return 'error';
         }
         if(pass.password.length < 6){
             $scope.pass.mess = 'Password is too short';
@@ -192,16 +197,12 @@ UserService, AccountService, DeviceAdapterService, ToastService, StateService, H
             $scope.pass.mess = 'Passwords do not match';
             return 'error';
         }
-        if(!pass.current_password && !UserService.user.forgot_password){
-            $scope.pass.mess = 'Enter current password';
-            return 'error';
-        }
 
-        $scope.pass.mess = null;
+        $scope.pass.mess = "";
         $scope.pass.is_valid = true;
-
         return 'good';
-    }
+    };
+
     $scope.passwordChange  = function(){
         $scope.popup = $ionicPopup.show({
             title: 'Change Password',
@@ -210,19 +211,22 @@ UserService, AccountService, DeviceAdapterService, ToastService, StateService, H
             cssClass: 'password',
             buttons: [
                 {
-                    text: 'Confirm',
+                    text: '<i class="ion-close"></i>',
                     onTap: function(e){
-                        if($scope.pass.is_valid){
-                            $scope.account.pass             = $scope.pass.password;
-                            $scope.account.current_password = $scope.pass.current_password;
-                        } else {
-                            e.preventDefault();
-                        }
+                        $scope.pass = angular.copy(deff_pass);
                     }
-                },{
-                    text: 'Cancel',
+                },
+                {
+                    text: '<i class="ion-checkmark"></i>',
                     onTap: function(e){
-                        $scope.pass                         = angular.copy(deff_pass);
+                        e.preventDefault();
+                        if ($scope.pass.is_valid){
+                            AccountService.checkCurrentPass($scope.pass.current_password).then(function() {
+                                $scope.account.pass             = $scope.pass.password;
+                                $scope.account.current_password = $scope.pass.current_password;
+                                $scope.popup.close();
+                            });
+                        }
                     }
                 }
             ]
@@ -292,7 +296,7 @@ UserService, AccountService, DeviceAdapterService, ToastService, StateService, H
 });
 
 angular.module('bazaarr').controller('UserCtrl',
-function($scope, $rootScope, $timeout, AccountService, FollowService, ToastService, userPicture, DeviceAdapterService) {
+function($scope, $state, $rootScope, $timeout, AccountService, FollowService, ToastService, userPicture, DeviceAdapterService) {
     /*if (!UserService.is_login) {
         $state.go('login');
         return false;
@@ -315,7 +319,12 @@ function($scope, $rootScope, $timeout, AccountService, FollowService, ToastServi
         $scope.account = AccountService.account;
     });
 
+    var follow_process = false;
     $scope.followUser = function(is_follow) {
+        if (follow_process) {
+            return false;
+        }
+        follow_process = true;
         var type = (1 == is_follow) ? 0 : 1;
         FollowService.followUser(AccountService.getAccountId(), type).then(function(data) {
             $scope.account.is_follow = type;
@@ -324,6 +333,7 @@ function($scope, $rootScope, $timeout, AccountService, FollowService, ToastServi
             if(data.data.message){
                 ToastService.showMessage("success", data.data.message);
             }
+            follow_process = false;
             // p(FollowService.colls);
             /*if(!data.data.user_follow){
                 for(var t in FollowService.colls){
@@ -379,6 +389,42 @@ function($scope, $rootScope, $timeout, AccountService, FollowService, ToastServi
         if($scope.account.about.length > 150) {
             $scope.isDescOpen = open;
         }
+    };
+
+    $scope.usernameResize = function() {
+        var container = document.getElementsByClassName("user-header");
+        if (container.length > 0) {
+            container = container[1] ? container[1] : container[0];
+            var name = container.getElementsByClassName("uname")[0];
+            var containerChildren = container.children;
+            var containerWidth = container.offsetWidth;
+            var fontSize = 22;
+            while (fontSize > 8) {
+                fontSize--;
+                name.style.fontSize = fontSize + 'px';
+                var widthSumm = 0;
+                for (var i = 0; i < containerChildren.length; i++) {
+                    widthSumm += containerChildren[i].offsetWidth + 2;
+                }
+                if (containerWidth > widthSumm) {
+                    break;
+                }
+            }
+        }
+    };
+
+    $scope.onScroll = function() {
+        $rootScope.$broadcast("scroll");
+    };
+
+    $scope.$on('orientation:change', function(event) {
+        $scope.usernameResize();
+    });
+
+    if($state.includes("account")) {
+        $timeout(function(){
+            $scope.usernameResize();
+        })
     }
 });
 
@@ -391,11 +437,17 @@ function($scope, $rootScope, $state, FollowService, AccountService, CollectionSe
 
     $scope.follows = follows.data;
 
+    var follow_process = false;
     $scope.followUser = function(uid, type, index) {
+        if (follow_process) {
+            return false;
+        }
+        follow_process = true;
         FollowService.followUser(uid, type).then(function(){
             $scope.follows[index].type = (0 === type) ? 1 : 0;
             FollowService.followUserCallback(type);
             //AccountService.updateCounts(); //UserService.updateCounts('following_count', type);
+            follow_process = false;
         });
     }
 
@@ -491,6 +543,7 @@ function(HttpService) {
         HttpService.view_url    = "users-recliped-clip";
         HttpService.params      = {nid: nid};
         HttpService.is_auth     = false;
+
         return HttpService.get();
     };
 
@@ -499,34 +552,44 @@ function(HttpService) {
         HttpService.view_url    = "users-liked-clips";
         HttpService.params      = {nid: nid};
         HttpService.is_auth     = false;
+
         return HttpService.get();
     };
-    
+
     this.loadCollectionLikes = function(bid) {
         this.title = 'People who like collection';
         HttpService.view_url    = "collection-likes";
         HttpService.params      = {"bid" : bid}
         HttpService.is_auth     = false;
-        
+
         return HttpService.get();
     };
-    
+
     this.loadCollectionReclips = function(bid) {
         this.title = 'People who reclip collection';
         HttpService.view_url    = "collection-reclips";
         HttpService.params      = {"bid" : bid}
         HttpService.is_auth     = false;
-        
+
         return HttpService.get();
     };
-    
+
     this.loadCollectionFollows = function(bid) {
         this.title = 'People who follow collection';
         HttpService.view_url    = "collection-followed";
         HttpService.params      = {"bid" : bid}
         HttpService.is_auth     = false;
-        
+
         return HttpService.get();
+    };
+
+    this.loadBrands = function() {
+        HttpService.view_url    = "brands-list";
+        HttpService.is_auth     = false;
+
+        var r = HttpService.get();
+
+        return r;
     };
 });
 
@@ -659,7 +722,7 @@ function($q, HttpService, ToastService) {
 });
 
 angular.module('bazaarr').service('AccountService',
-function($rootScope, $state, $timeout, $ionicHistory, HttpService, UserService) {
+function($rootScope, $state, $timeout, $q, $ionicHistory, $ionicLoading, HttpService, UserService, ToastService) {
     this.account        = {};
     this.account_id     = 0;
     this.is_my_account  = true;
@@ -722,6 +785,10 @@ function($rootScope, $state, $timeout, $ionicHistory, HttpService, UserService) 
             $timeout(function() {
                 $rootScope.$broadcast("profile:update");
             }, 200);
+            if (that.is_my_account) {
+                UserService.user    = data.data;
+                $rootScope.user     = data.data;
+            }
         });
         return promise;
     };
@@ -797,12 +864,32 @@ function($rootScope, $state, $timeout, $ionicHistory, HttpService, UserService) 
 
     this.update = function() {
         var that = this;
-        $ionicHistory.clearCache();
+        HttpService.clearViewCache();
         HttpService.addNoCache("user/" + this.getAccountId());
         this.load($state.params.userId).then(function(data) {
             that.account = data.data;
             $rootScope.$broadcast("profile:update");
         });
+    };
+
+    this.checkCurrentPass = function(password) {
+        if (angular.isUndefined(password) || !password || password === "") {
+            ToastService.showMessage("danger", "Please set your password!");
+            return $q.reject();
+        }
+        HttpService.view_url = "check-password";
+        HttpService.params   = {"data" : password};
+
+        $ionicLoading.show();
+        var promise = HttpService.post();
+        promise.then(function() {
+            $ionicLoading.hide();
+        }, function(reason) {
+            ToastService.showMessage("danger", reason.data[0]);
+            $ionicLoading.hide();
+        });
+
+        return promise;
     };
 });
 
@@ -851,7 +938,9 @@ function($rootScope, $ionicHistory, HttpService, AccountService, CollectionServi
         HttpService.params   = {"type" : "collection", "action" : type};
         var promise = HttpService.put();
         promise.then(function(){
-        	CollectionService.updateCollectionField(bid, "followed", type, "update");
+            CollectionService.updateCollectionField(bid, "followed", type, "update");
+            CollectionService.updateCollectionField(bid, "count_followers", type, "increment");
+            HttpService.clearHttpCache("collection-followed");
         });
         return promise;
     };
@@ -962,7 +1051,7 @@ ConfigService, UserService, DeviceAdapterService, ToastService) {
     this.load = function() {
         var config = {};
         var api_url = "api/v1";
-        
+
         if (this.is_auth) {
             config = UserService.getConfig();
             if (!config) {
@@ -970,7 +1059,7 @@ ConfigService, UserService, DeviceAdapterService, ToastService) {
             }
             //api_url = "apiuser";
         }
-        
+
         var url = ConfigService.server_url() + "/"
                 + api_url + "/"
                 + this.view_url + "/"
@@ -1059,11 +1148,22 @@ ConfigService, UserService, DeviceAdapterService, ToastService) {
     };
 
     this.clearCache = function() {
-        $ionicHistory.clearCache();
         var $httpDefaultCache = $cacheFactory.get('$http');
         $httpDefaultCache.removeAll();
-        $rootScope.clearClipPager();
+        this.clearViewCache();
     };
+
+    this.clearHttpCache = function() {
+        var that = this;
+        angular.forEach(arguments, function(value) {
+            that.addNoCache(value);
+        });
+    };
+
+    this.clearViewCache = function() {
+        $rootScope.clearClipPager();
+        $ionicHistory.clearCache();
+    }
 });
 
 angular.module('bazaarr').service('UserService',
@@ -1085,13 +1185,13 @@ function($q, $http, $rootScope, $cookies, $cookieStore, $state, $timeout, localS
                 + '?prot=' + window.location.protocol + '&dom=' + ConfigService.connect_url(),
             {"uid" : this.user.uid}));
         var promise = dfd.promise;
-        
-        promise.then(function() {
-            
+        var that = this;
+        promise.then(function(data) {
+            that.token = data.data;
         }, function(reason) {
-            
+
         });
-        
+
         return promise;
     },
 
@@ -1152,6 +1252,8 @@ function($q, $http, $rootScope, $cookies, $cookieStore, $state, $timeout, localS
             return $q.reject({"data" : ""});
         }
 
+        this.clearCookies();
+
         type = type || "user/login";
         var config = this.getConfig();
 
@@ -1161,9 +1263,18 @@ function($q, $http, $rootScope, $cookies, $cookieStore, $state, $timeout, localS
 
         dfd.resolve($http.post(ConfigService.server_url() + '/api/v1/' + type + '/'
                 + '?prot=' + window.location.protocol + '&dom=' + ConfigService.connect_url(),
-                user));
+                user, config));
 
-        return dfd.promise;
+        var promise = dfd.promise;
+        var that    =  this;
+        promise.then(function() {
+            that.getToken();
+        }, function(reason) {
+            ToastService.showMessage("danger", reason.data);
+            that.getToken();
+        });
+
+        return promise
     },
 
     this.signInValidate = function(user, type) {
@@ -1191,25 +1302,27 @@ function($q, $http, $rootScope, $cookies, $cookieStore, $state, $timeout, localS
     },
 
     this.getConfig = function() {
-        if (!this.is_login || !this.token) {
+        if (!this.token) {
             return false;
         }
-        
+
+        var credentials = this.is_login ? true : false;
+
         var config = {
             "headers" : {
                 'Content-Type'      : 'application/json', //x-www-form-urlencoded
                 'X-CSRF-Token'      : this.token
             },
-            'withCredentials'   : true,
+            'withCredentials'   : true,//credentials,
             'crossDomain'       : true
         }
-        
+
         return config;
     },
 
     this.clearCookies = function() {
         angular.forEach($cookies, function (v, k) {
-            $cookieStore.remove(k);
+            $cookies.remove(k);
         });
     },
 
@@ -1295,7 +1408,7 @@ angular.module('bazaarr').service('DeviceAdapterService', function($cordovaDevic
     };
 });
 
-angular.module('bazaarr').service('userPicture', 
+angular.module('bazaarr').service('userPicture',
 function($timeout, $ionicLoading, $ionicPopup, $cordovaCamera, UserService, DeviceAdapterService, AccountService, ToastService, HttpService) {
 
     this.popup = null;
@@ -1311,7 +1424,8 @@ function($timeout, $ionicLoading, $ionicPopup, $cordovaCamera, UserService, Devi
             scope: scope,
             cssClass: 'profile-photo',
             buttons: [
-                {text: 'Cancel'}
+                {text: 'Cancel'},
+                {text: 'Change', onTap: scope.openPhotoSourcePopup, type: 'button-positive'}
             ]
         });
     };

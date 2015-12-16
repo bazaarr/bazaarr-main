@@ -1,8 +1,10 @@
-<ul class="list shared">
-    <li ng-repeat="follower in shared.followed" class="item item-checkbox">
-        <label class="checkbox">
-            <input ng-model="checked_data[follower.uid]" type="checkbox">
-        </label>
-        {{follower.name}}
-    </li>
-</ul>
+<ion-scroll style="height: 100%">
+    <ul class="list shared" style="height: {{shared.followed.length * 53 + 100}}px">
+        <li ng-repeat="follower in shared.followed" class="item item-checkbox">
+            <label class="checkbox">
+                <input ng-model="checked_data[follower.uid]" type="checkbox">
+            </label>
+            {{follower.name}}
+        </li>
+    </ul>
+</ion-scroll>

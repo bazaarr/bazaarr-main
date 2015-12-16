@@ -14,23 +14,10 @@
             </form>
         </div>
     </div>
-
-
-    <ion-content has-header="true" has-tabs="true" on-swipe-right="backCondition()" class="search-all">
-        <div class="search-section users" ng-if="tags.length > 0">
-            <ion-list class="tags-list">
-                <ion-item ng-repeat="tag in tags">
-                    <div class="row row-center">
-                        <div class="col" on-tap="$state.go('hashtag', {'hashtagName' : tag.name})">
-                            <div class="name" on-tap="$state.go('collection', {'colId' : collection.bid})">
-                                #{{tag.name}}
-                            </div>
-                            <div class="info">
-                                {{tag.clips_count}} clip{{tag.clips_count == 1 ? '' : 's'}}
-                            </div>
-                        </div>
-                    </div>
-                </ion-item>
+    <ion-content has-header="true" has-tabs="true" on-swipe-right="back()" class="search-all">
+        <div class="search-section users tags-list" ng-if="tags.length > 0">
+            <ion-list>
+                <hashtag-item ng-repeat="hashtag in tags" name="{{hashtag.name}}" view="search" class="hashtag-item"></hashtag-item>
             </ion-list>
         </div>
         <div class="search-no-results" ng-if="tags.length == 0">No results</div>

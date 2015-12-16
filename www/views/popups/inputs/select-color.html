@@ -4,13 +4,14 @@
     <li ng-click="popupSelectClick('search.sort_by', 'price_value', 'Price')" ng-if="search.price_type != 1">Price</li>
 </ul>
 -->
-<div class="select-color">
-    <ion-radio ng-repeat="item in searchColors"
-               ng-model="search"
-               ng-class="checkColor(item.hex)"
-               ng-click="selectColor(item.hex)"
-               name="color-group"
-               style="background-color: #{{item.hex}}">
-    </ion-radio>
-    <div class="clearfix"></div>
-</div>
+<ion-scroll style="height: 100%">
+    <div class="select-color" style="height: 1320px">
+        <ion-radio ng-repeat="item in searchColors"
+                   ng-model="search"
+                   ng-class="checkColor(item.hex)"
+                   ng-click="selectColor(item.hex)"
+                   name="color-group"
+                   style="background-color: #{{item.hex}}">
+        </ion-radio>
+    </div>
+</ion-scroll>

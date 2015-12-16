@@ -1,43 +1,59 @@
-
-<ion-slide-box class="intro-slider">
-    <ion-slide>
-        <div class="iphone-frame">
-        </div>
-        <img src="/m/images/intro/1.png">
-        <p>
-            Browse through thousands of fashions, designers & Merchants
-        </p>
-    </ion-slide>
-    <ion-slide>
-        <div class="iphone-frame">
-        </div>
-        <img src="/m/images/intro/2.png">
-        <p>
-            Sort by your terms, explore and discover
-        </p>
-    </ion-slide>
-    <ion-slide>
-        <div class="iphone-frame">
-        </div>
-        <img src="/m/images/intro/3.png">
-        <p>
-            Like what you see? Click it and clip it to your own collection
-        </p>
-    </ion-slide>
-    <ion-slide>
-        <div class="iphone-frame">
-        </div>
-        <img src="/m/images/intro/4.png">
-        <p>
-            Share your collections with whom you wish.
-        </p>
-    </ion-slide>
-    <ion-slide>
-        <div class="iphone-frame">
-        </div>
-        <img src="/m/images/intro/5.png">
-        <p>
-            Keep a visual style journal via you collections and explore others’ as well
-        </p>
-    </ion-slide>
-</ion-slide-box>
+<div class="intro-slider-wrapper">
+    <ion-slide-box class="intro-slider">
+        <ion-slide>
+            <div class="img-wrapper">
+                <img src="/m/images/intro/1.png">
+            </div>
+            <p>
+                Browse through thousands of fashions, designers & Merchants
+            </p>
+            <div class="control">
+                <div class="btn" on-tap="$state.go('explore')">
+                    Skip
+                </div>
+            </div>
+        </ion-slide>
+        <ion-slide>
+            <div class="img-wrapper">
+                <img src="/m/images/intro/2.png">
+            </div>
+            <p>
+                Sort by your terms, explore and discover
+            </p>
+        </ion-slide>
+        <ion-slide>
+            <div class="img-wrapper">
+                <img src="/m/images/intro/3.png">
+            </div>
+            <p>
+                Like what you see? Click it and clip it to your own collection
+            </p>
+        </ion-slide>
+        <ion-slide>
+            <div class="img-wrapper">
+                <img src="/m/images/intro/4.png">
+            </div>
+            <p>
+                Share your collections with whom you wish.
+            </p>
+        </ion-slide>
+        <ion-slide>
+            <div class="img-wrapper">
+                <img src="/m/images/intro/5.png">
+            </div>
+            <div class="control right">
+                Done
+            </div>
+            <p>
+                Keep a visual style journal via you collections and explore others’ as well
+            </p>
+            <div class="control">
+                <div class="btn" on-tap="$state.go('explore')">
+                    Done
+                </div>
+            </div>
+        </ion-slide>
+    </ion-slide-box>
+</div>
+<div class="iphone-frame">
+</div>

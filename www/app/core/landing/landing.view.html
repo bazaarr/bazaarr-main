@@ -1,0 +1,78 @@
+<ion-view class="landing-view">
+    <ion-content has-header="true" has-tabs="true" scroll="false">
+        <ion-super-slide-box direction="'vertical'" show-pager="false" class="slide">
+            <ion-super-slide class="slide">
+                <div class="slide-bg" ng-style="{'background-image' : 'url(/m/images/bg/4.jpg)'}">
+                    <div class="landing-logo">
+                        <img src="images/Logo-t@2x.png" width="140px">
+                    </div>
+                    <div ng-switch on="form" class="vertical-c form image-shadow">
+                        <div ng-switch-when="login" class="horizontal-c limit-width-380">
+                            <div ng-controller='LoginCtrl'>
+                                <ng-include src="'app/common/form/login/form-login.view.html'"></ng-include>
+                            </div>
+                            <button class="button button-block login-btn login" ng-click="setForm('forgot-password')">Forgot password</button>
+                            <button class="button button-block login-btn login" ng-click="setForm('registration')">Create new account</button>
+                        </div>
+                        <div ng-switch-when="forgot-password" class="horizontal-c limit-width-380">
+                            <div ng-controller='ForgotPasswordCtrl'>
+                                <ng-include src="'app/common/form/forgot-password/form-forgot-password.view.html'"></ng-include>
+                            </div>
+                            <button class="button button-block login-btn login" ng-click="setForm('login')">Sign in</button>
+                            <button class="button button-block login-btn login" ng-click="setForm('registration')">Create new account</button>
+                        </div>
+                        <div ng-switch-default class="horizontal-c limit-width-380">
+                            <div ng-controller='LoginCtrl'>
+                                <ng-include src="'app/common/form/registration/form-registration.view.html'"></ng-include>
+                                <div class="login-text">
+                                    Already registered? <a href="#!/login">Sign In</a><br>or<br><span ng-click="fbLogin()">Log In with Facebook</span>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="/m/#!/login" class="landing-login-button">Login</a>
+                    </div>
+                    <a href="#!/explore" class="link explore-link">Explore</a>
+                    <div class="landing-bottom-text">
+                        By continuing, you accept the <a href="#!/about-bazaarr">Terms of Use</a>
+                        and <a href="#!/about-bazaarr">Privacy Policy.</a>
+                    </div>
+                    <div class="pagination ion-android-arrow-down horizontal-c"></div>
+                </div>
+            </ion-super-slide>
+            <ion-super-slide class="slide">
+                <div class="section-title vertical-c" ng-style="{'background' : '#FFB22C'}">
+                    <div class="horizontal-c">
+                        <h1>{{landing[2].title}}</h1>
+                        <div ng-bind-html="landing[2].description"></div>
+                    </div>
+                </div>
+                <ng-include src="'app/core/hashtags/list/hashtags-list.tpl.html'" />
+            </ion-super-slide>
+            <ion-super-slide class="slide">
+                <div class="section-title vertical-c" ng-style="{'background' : '#FF3644'}">
+                    <div class="horizontal-c">
+                        <h1>{{landing[3].title}}</h1>
+                        <div>{{landing[3].description}}</div>
+                    </div>
+                </div>
+                <div class="tags-list">
+                    <ion-list>
+                        <ion-item ng-repeat="collection in collections" class="hashtag-item">
+                            <div class="hashtag-block" style="background-image: url('{{collection.cover_img}}')">
+                                <div class="image-shadow">
+                                    <a class="name" href="#!/collection/{{collection.tid}}">
+                                        <div class="horizontal-c">
+                                            <div class="text">
+                                                {{collection.name}}
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </ion-item>
+                    </ion-list>
+                </div>
+            </ion-super-slide>
+        </ion-super-slide-box>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,2 @@
+<ng-include ng-if="$state.includes('account.following-collections')" src="'views/menu/follow.html'"></ng-include>
+<ng-include ng-repeat="collection in collections" src="'views/user/collection.html'" class="coll-row-wrapper"></ng-include>

@@ -7,24 +7,8 @@
                     <div>
                         <img class="login-logo" src="images/Logo@2x.png" width="200" height="43" />
                     </div>
-                    <label class="item item-input">
-                        <span class="input-label">Username</span>
-                        <input type="text" ng-model="user.name">
-                    </label>
-                    <label class="item item-input">
-                        <span class="input-label">E-mail</span>
-                        <input type="email" ng-model="user.mail">
-                    </label>
-                    <label class="item item-input">
-                        <span class="input-label">Password</span>
-                        <input type="password" ng-model="user.pass">
-                    </label>
-                    <div>
-                        <button class="button button-block button-dark login-btn" ng-click="create(user)">
-                            Create new account
-                        </button>
-                        <div class="login-button-reg text-center"><a href="#!/login">Sign In</a></div>
-                    </div>
+                    <ng-include src="'app/common/form/registration/form-registration.view.html'"></ng-include>
+                    <div class="login-button-reg text-center"><a href="#!/login">Sign In</a></div>
                 </div>
             </div>
         </div>

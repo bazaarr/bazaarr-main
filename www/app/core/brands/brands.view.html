@@ -1,0 +1,15 @@
+<ion-view class="brands-view" title="Brands">
+
+    <ion-nav-buttons side="primary">
+        <button class="button" ng-click="back()">
+            <i class="ion-chevron-left"></i>
+        </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="secondary"></ion-nav-buttons>
+
+    <ion-content has-header="true" has-tabs="true" class="brands-list">
+        <div ng-repeat="brand in brands">
+            <brand-item brand="brand"></brand-item>
+        </div>
+    </ion-content>
+</ion-view>

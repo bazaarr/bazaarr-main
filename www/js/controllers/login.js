@@ -2,7 +2,7 @@
 
 angular.module('bazaarr').controller('LoginCtrl',
 function($scope, $rootScope, $state, $cookies, $cordovaPush,
-UserService, RegistrationService, DeviceAdapterService, CollectionService, ToastService, HttpService, MetaService) {
+UserService, RegistrationService, DeviceAdapterService, CollectionService, ToastService, HttpService, MetaService, FacebookService) {
     if (UserService.is_login) {
         $state.go('account.collections', {"userId" : UserService.user.uid});
         return false;
@@ -61,7 +61,23 @@ UserService, RegistrationService, DeviceAdapterService, CollectionService, Toast
         },
         function(reason) {
             UserService.clearUser();
-            ToastService.showMessage("danger", reason.data);
+            /*if(typeof reason.data.messages != 'undefined'){
+                var msgs = reason.data.messages,
+                    _rs = [];
+                for(var f in msgs){
+                    var _msgs = msgs[f];
+                    if(_msgs.length){
+                        for(var i=0;i<_msgs.length;i++){
+                            _rs.push(_msgs[i]);
+                        }
+                    }
+                }
+                if(_rs.length){
+                    ToastService.showMessage('danger', _rs.join('</br>').replace('/user/password', '#!/forgot-password'));
+                }
+            } else {
+                ToastService.showMessage("danger", reason.data);
+            }*/
         });
     }
 
@@ -77,55 +93,13 @@ UserService, RegistrationService, DeviceAdapterService, CollectionService, Toast
         });
     };
 
-    var domain = window.location.host.split('.').pop(),
-        appId = '';
-    switch(domain){
-        case 'dev':
-            appId = 1679150075655169;
-            break;
-        case 'org':
-            appId = 430153587174464;
-            break;
-        case 'net':
-            appId = 430153653841124;
-            break;
-        case 'com':
-            appId = 302850933231229;
-            break;
-    }
-    if (appId) {
-        openFB.init({appId: appId});
-    }
-
     $scope.fbLogin = function() {
-        openFB.login(function(response) {
-            if (response.status === 'connected') {
-                openFB.api({
-                    path: '/me',
-                    success: function(data) {
-                        data.is_fb = true;
-
-                        $scope.signIn(data, "social");
-                    }
-                });
-                p('Facebook login succeeded, got access token: ' + response.authResponse.token);
-            }
-            else {
-                p('Facebook login failed: ' + response.error);
-            }
-        }, {scope: 'email,user_about_me,user_birthday,user_friends,user_hometown,user_website,publish_actions'});//'email,read_stream,publish_stream'
+        FacebookService.login().then(function(data) {
+            $scope.signIn(data.data, "social");
+        });
     };
-    /* denysovpavlo@gmail.com
-     * 548F12cab
-     */
 
-
-    //$scope.getToken();
     $scope.user = {};
-    /*$scope.user.username = "admin";
-    $scope.user.password = "abcd1234";*/
-
-    //$scope.signIn(user);
 });
 
 angular.module('bazaarr').controller('ForgotPasswordCtrl', function($scope, ForgotPasswordService, ToastService) {
@@ -162,7 +136,7 @@ function($state, UserService, ToastService, CollectionService, HttpService) {
         success: function(user) {
             /* TODO: connect with LoginCtrl */
             user.is_fb = true;
-            
+
             if (UserService.is_login) {
                 $state.go('account.collections', {"userId" : UserService.user.uid});
                 return false;

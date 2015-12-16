@@ -1,1 +1,1 @@
-<textarea ng-model="comment.body_value"></textarea>
+<textarea ng-model="comment.body_value" ng-keydown="textareaLimit(2, 4, 80);" ng-keyup="textareaLimit(2, 4, 80);" ng-paste="textareaLimit(2, 4, 80);"></textarea>

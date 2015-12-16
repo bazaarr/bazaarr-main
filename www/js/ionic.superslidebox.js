@@ -50,6 +50,13 @@
 
             function setup() {
 
+                if(window.lastSliderW) {
+                    if(window.lastSliderW == window.innerWidth) {
+                        return
+                    }
+                }
+                window.lastSliderW = window.innerWidth;
+
                 // cache slides
                 slides = element.children;
                 length = slides.length;

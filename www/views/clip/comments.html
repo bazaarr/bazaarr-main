@@ -53,9 +53,9 @@
             <div class="comment-field" ng-if="isLogin()">
                 <div class="input-wrapper">
                      <textarea rows="4" class="comment-input" ng-model="new_comment.body_value" placeholder="Add a comment"
-                               ng-keydown="textareaLimit(this, 4, 80);"
-                               ng-keyup="textareaLimit(this, 4, 80);"
-                               ng-paste="textareaLimit(this, 4, 80);"
+                               ng-keydown="textareaLimit(1, 4, 80);"
+                               ng-keyup="textareaLimit(1, 4, 80);"
+                               ng-paste="textareaLimit(1, 4, 80);"
                                style="overflow: hidden; resize: none;"></textarea>
                 </div>
                 <div class="button-wrappper send-comment-button">

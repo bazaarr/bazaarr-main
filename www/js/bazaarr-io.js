@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModule', 'ngToast'])
+angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModule', 'ngToast', 'ngIOS9UIWebViewPatch',  'ionic.ui.superSlideBox'])
 //.value('server_url', "http://bazaarr.dev").value('connect_url', "mbazar")
 .value('server_url', window.location.protocol + '//' + window.location.host).value('connect_url', window.location.host)//"app.icenium.com"
 .value('clip', {})
@@ -11,8 +11,14 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
 .config(function($stateProvider, $urlRouterProvider, $httpProvider, $ionicConfigProvider, ngToastProvider, $locationProvider) {
     $locationProvider.hashPrefix("!");
     //$locationProvider.html5Mode({enabled : true});
-    
+
     $stateProvider
+        .state('wrap', {
+            cache: false,
+            abstract: true,
+            controller: 'WrapCtrl',
+            templateUrl: 'app/common/wrap/wrap.view.html'
+        })
         .state('claim-user', {
             url: '/claim-user/:userId',
             cache: false,
@@ -54,21 +60,44 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
             controller: 'ClipsCtrl',
             templateUrl: 'views/clips.html'
         })
+        .state('following-collections', {
+            url: '/following-collections',
+            resolve: {
+                collections: function(FollowService) {
+                    return FollowService.loadCollections();
+                }
+            },
+            controller: 'CollectionListCtrl',
+            templateUrl: 'views/user/collections.html'
+        })
+        .state('following-tags', {
+            url: '/following-tags',
+            resolve: {
+                hashtags: function(HashtagsService) {
+                    return HashtagsService.loadListByUser();
+                }
+            },
+            controller: 'HashtagListCtrl',
+            templateUrl: 'app/core/hashtags/list/hashtags-list.view.html',
+            params: {
+                hashtag_item_view : "following"
+            }
+        })
+        .state('following-users', {
+            url: "/following-users",
+            resolve: {
+                follows: function(FollowService) {
+                    return FollowService.loadFollowing();
+                }
+            },
+            controller: 'FollowCtrl',
+            templateUrl: 'views/user/follow.view.html'
+        })
         .state('shop', {
             url: '/shop?page',
             resolve: {
                 clips: function(ClipsService) {
                     return ClipsService.load("shop", false);
-                }
-            },
-            controller: 'ClipsCtrl',
-            templateUrl: 'views/clips.html'
-        })
-        .state('category', {
-            url: '/category/:catId?page',
-            resolve: {
-                clips: function(ClipsService, $stateParams) {
-                    return ClipsService.load("clips-category", false, {"tid_raw" : $stateParams.catId});
                 }
             },
             controller: 'ClipsCtrl',
@@ -93,7 +122,7 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
                 }
             },
             controller: 'CollectionListCtrl',
-            templateUrl: 'views/user/collections.html'
+            templateUrl: 'views/user/account-collections.html'
         })
         .state('account.clips', {
             url: "/clips?page",
@@ -133,7 +162,20 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
                 }
             },
             controller: 'CollectionListCtrl',
-            templateUrl: 'views/user/collections.html'
+            templateUrl: 'views/user/account-collections.html'
+        })
+        .state('account.following-hashtags', {
+            url: "/following-hashtags",
+            resolve: {
+                hashtags: function(HashtagsService) {
+                    return HashtagsService.loadListByUser();
+                }
+            },
+            controller: 'HashtagListCtrl',
+            templateUrl: 'app/core/hashtags/list/hashtags-list.tpl.html',
+            params: {
+                hashtag_item_view : "account"
+            }
         })
         .state('account.followers', {
             url: "/followers",
@@ -278,7 +320,8 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
         .state('search-clips', {
             url : '/search-clips/:query',
             resolve: {
-                clips: function(SearchService) {
+                clips: function(SearchService, $stateParams) {
+                    SearchService.params.search_api_views_fulltext = $stateParams.query;
                     return SearchService.load();
                 }
             },
@@ -312,6 +355,7 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
         })
         .state('comments', {
             url : '/comments/:clipId',
+            cache: false,
             resolve: {
                 comments: function(CommentService, $stateParams) {
                     return CommentService.load($stateParams.clipId);
@@ -399,6 +443,7 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
         })
         .state('collection-likes', {
             url: '/collection-likes/:colId',
+            cache: false,
             resolve: {
                 users: function(UserListService, $stateParams) {
                     return UserListService.loadCollectionLikes($stateParams.colId);
@@ -409,6 +454,7 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
         })
         .state('collection-reclips', {
             url: '/collection-reclips/:colId',
+            cache: false,
             resolve: {
                 users: function(UserListService, $stateParams) {
                     return UserListService.loadCollectionReclips($stateParams.colId);
@@ -419,6 +465,7 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
         })
         .state('collection-follows', {
             url: '/collection-follows/:colId',
+            cache: false,
             resolve: {
                 users: function(UserListService, $stateParams) {
                     return UserListService.loadCollectionFollows($stateParams.colId);
@@ -437,6 +484,7 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
         })
         .state('clip-reclips', {
             url: '/clip-reclips/:clipId',
+            cache: false,
             resolve: {
                 users: function(UserListService, $stateParams) {
                     return UserListService.getReclips($stateParams.clipId);
@@ -447,6 +495,7 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
         })
         .state('clip-likes', {
             url: '/clip-likes/:clipId',
+            cache: false,
             resolve: {
                 users: function(UserListService, $stateParams) {
                     return UserListService.getLikes($stateParams.clipId);
@@ -471,11 +520,64 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
             url: '/download',
             templateUrl: 'views/download.html'
         })
+        .state('landing', {
+            url: '/',
+            resolve: {
+                landing: function(LandingService) {
+                    return LandingService.load();
+                }
+            },
+            controller: 'LandingCtrl',
+            templateUrl: 'app/core/landing/landing.view.html'
+        })
+        .state('explore', {
+            url: '/explore',
+            resolve: {
+                explore: function(ExploreService) {
+                    return ExploreService.load();
+                },
+                titles : function(ExploreService) {
+                    return ExploreService.loadTitles();
+                }
+            },
+            controller: 'ExploreCtrl',
+            templateUrl: 'app/core/explore/explore.view.html'
+        })
+        .state('brands', {
+            url: '/brands',
+            controller: 'BrandsCtrl',
+            resolve: {
+                brands: function(UserListService) {
+                    return UserListService.loadBrands();
+                }
+            },
+            templateUrl: 'app/core/brands/brands.view.html'
+        })
+        .state('clips-by-color', {
+            url: '/clips-by-color/:hex?page',
+            resolve: {
+                clips: function(ClipsService, $stateParams) {
+                    return ClipsService.load("clips-by-color", false, {"clip_colors_hex" : $stateParams.hex});
+                }
+            },
+            controller: 'ClipsCtrl',
+            templateUrl: 'views/clips.html'
+        })
+        .state('popular', {
+            url: '/popular?page',
+            resolve: {
+                clips: function(ClipsService) {
+                    return ClipsService.load("explore-popular", false);
+                }
+            },
+            controller: 'ClipsCtrl',
+            templateUrl: 'views/clips.html'
+        })
         ;
-    $urlRouterProvider.otherwise('/recent');
+    $urlRouterProvider.otherwise('/'); //recent
 
     $httpProvider.defaults.withCredentials = true;
-    
+
     //Enable cross domain calls
     $httpProvider.defaults.useXDomain = true;
 
@@ -514,13 +616,13 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
             }
             ionic.DomUtil.cachedStyles(ele, css);
         }
-        
+
         var d = {
             run: function(step) {
                 if (direction == 'forward') {
                     setStyles(enteringEle, 1, (1 - step) * 99, 1 - step); // starting at 98% prevents a flicker
                     setStyles(leavingEle, (1 - 0.1 * step), step * -33, -1);
-                
+
                 } else if (direction == 'back') {
                     setStyles(enteringEle, (1 - 0.1 * (1 - step)), (1 - step) * -33, -1);
                     setStyles(leavingEle, 1, step * 100, 1 - step);
@@ -544,7 +646,7 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
 
         return d;
     };
-    
+
     $ionicConfigProvider.transitions.views.android = function(enteringEle, leavingEle, direction, shouldAnimate) {
         shouldAnimate = shouldAnimate && (direction == 'forward' || direction == 'back' || direction == 'up' || direction == 'down');
 
@@ -569,7 +671,7 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
                 } else if (direction == 'back') {
                     setStyles(enteringEle, (1 - step) * -100);
                     setStyles(leavingEle, step * 100);
-                
+
                 } else if (direction == 'up') {
                     setStyles(enteringEle, (1 - step) * 99, "vertical");
                     setStyles(leavingEle, step * -100, "vertical");
@@ -577,7 +679,7 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
                 } else if (direction == 'down') {
                     setStyles(enteringEle, (1 - step) * -100, "vertical");
                     setStyles(leavingEle, step * 100, "vertical");
-                
+
                 } else {
                     // swap, enter, exit
                     setStyles(enteringEle, 0);
@@ -597,14 +699,14 @@ angular.module('bazaarr', ['ionic', 'ngCordova', 'ngCookies', 'LocalStorageModul
     });
 
 })
-.run(function($rootScope, $location, $state, $ionicScrollDelegate, $ionicViewSwitcher, $cookies, 
-$cordovaInAppBrowser, $cordovaStatusbar, $cordovaAppVersion, localStorageService, DeviceAdapterService, MenuService, 
+.run(function($rootScope, $location, $state, $ionicScrollDelegate, $ionicViewSwitcher, $cookies,
+$cordovaInAppBrowser, $cordovaStatusbar, $cordovaAppVersion, localStorageService, DeviceAdapterService, MenuService,
 UserService, AccountService, CollectionService, ConfigService, HttpService, ClipsService, StateService, MetaService) {
     $rootScope.is_app = false;
         document.addEventListener("deviceready", function() {
         DeviceAdapterService.is_ready = true;
         $rootScope.is_app = true;
-        
+
         $cordovaStatusbar.overlaysWebView(true);
         $cordovaStatusbar.style(1);
 
@@ -622,7 +724,7 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
             }
             localStorageService.set("version", current_version);
         });
-        
+
     }, false);
 
     $rootScope.config = {
@@ -674,35 +776,35 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
          */
         if ($rootScope.backState.length) {
             var last_state = $rootScope.backState[$rootScope.backState.length - 1];
-            if (angular.isDefined(last_state.params) && angular.isDefined(last_state.params.colId) 
+            if (angular.isDefined(last_state.params) && angular.isDefined(last_state.params.colId)
                     && last_state.state === toState.name && last_state.params.colId === toParams.colId) {
                 $rootScope.backState.pop();
                 $rootScope.backEvent = true;
             }
         }
-        
+
         /*
          * if not back button event, not clip swiping, not account substate change
          * - add previous state to our own history stack
          */
         if (!$rootScope.backEvent && fromState.name && !(fromState.name === "clip" && toState.name === "clip")
-                && fromState.name !== "login"
+                && fromState.name !== "login" && fromState.name !== "add-collection"
                 && !(fromState.name.indexOf("account") === 0 && toState.name.indexOf("account") === 0
                     && fromParams.userId === toParams.userId)) {
             $rootScope.backState.push({'state' : fromState.name, 'params' : fromParams, 'clip_list' : ClipsService.page_api_url});
         }
-        
+
         /* add our own history stack to localstorage, for enable history after browser reload */
         if (fromState.name && $rootScope.backState.length) {
             localStorageService.set("backState", $rootScope.backState);
         }
         $rootScope.backEvent    = false;
-        
+
         MetaService.setDefault();
     });
-    
+
     window.addEventListener('popstate', function(e){
-        
+
     }, false);
 
     $rootScope.goUserMenu = function(state) {
@@ -744,14 +846,14 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
         if (!$rootScope.backState.length) {
             $rootScope.backState = localStorageService.get("backState");
         }
-        
+
         if ($rootScope.backState.length) {
             var back_state = $rootScope.backState.pop();
 
             if (back_state.state) {
                 ClipsService.page_api_url = back_state.clip_list;
                 $state.go(back_state.state, back_state.params);
-            } 
+            }
             else {
                 $state.go("recent");
                 //window.history.back();
@@ -760,6 +862,12 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
         else {
             $state.go("recent");
             //window.history.back();
+        }
+    };
+
+    $rootScope.accountBack = function(isMyAccount) {
+        if(!isMyAccount) {
+            $rootScope.back();
         }
     };
 
@@ -782,6 +890,10 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
 
         return true;
     };
+
+    $rootScope.openOnMap = function(location) {
+        this.openInApp('https://maps.google.com/maps/?q=' + location, false, false);
+    }
 
     $rootScope.openInApp = function(url, self, is_target) {
         if (!url) {
@@ -824,7 +936,7 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
     $rootScope.clearClipPager = function() {
         ClipsService.pager = {};
     }
-    
+
     //remove Ionic listener, which update the head title
     $rootScope.$$listeners['$ionicView.afterEnter'] = [];
 
@@ -837,8 +949,10 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
     $rootScope.$state       = $state;
     $rootScope.StateService = StateService;
 
+    /*
+     * get seesion from localstorage
+     * */
     var session = localStorageService.get("session");
-
     if (session) {
         UserService.is_login    = true;
         UserService.user        = session.user;
@@ -846,13 +960,12 @@ UserService, AccountService, CollectionService, ConfigService, HttpService, Clip
         CollectionService.user_collections  = session.collections;
 
         $cookies[session.session_name]    = session.sessid;
-    }
-
-    if (UserService.is_login) {
+        UserService.getToken();
         $rootScope.user     = UserService.user;
-
-        UserService.getToken().then(function(data) {
-            UserService.token = data.data;
+    }
+    else {
+        UserService.getToken().then(function() {
+            UserService.logout();
         });
     }
 })
@@ -893,7 +1006,7 @@ angular.module('bazaarr').service('ConfigService', function(DeviceAdapterService
     this.connect_url = function(){
         return window.location.host;
     };
-    
+
     this.website_url = function() {
         var host    = window.location.host.replace("m\.", "");
         var prehost = "";
@@ -909,66 +1022,66 @@ angular.module('bazaarr').service('ConfigService', function(DeviceAdapterService
     };
 });
 
-angular.module('bazaarr').service('MetaService', function($rootScope, $location, ConfigService, AccountService) {
+angular.module('bazaarr').service('MetaService', function($rootScope, $location, $state, ConfigService, AccountService) {
     this.head               = {};
     this.head.title         = "";
     this.head.description   = "";
     this.head.prev_href     = "";
     this.head.next_href     = "";
     this.head.canonical_url = "";
-    
+
     this.seo_cur_page   = 0;
-    
+
     this.set = function(view, type, params, page) {
         if (angular.isUndefined(this[view])) {
             return false;
         }
-        
+
         var result = this[view](type, params, page);
         $rootScope.head = this.head;
         return result;
     };
-    
+
     this.setDefault = function() {
         this.head           = {};
         this.head.title     = ConfigService.site_name + " | " + ConfigService.title_keywords;
         $rootScope.head     = this.head;
     };
-    
+
     this.setTitle = function(title) {
         title = title ? title + " | " : "";
         this.head.title          = title + ConfigService.site_name + " | " + ConfigService.title_keywords;
     };
-    
+
     this.setDescription = function(description) {
         description = description || ConfigService.meta_description;
         this.head.description = description;
     };
-    
+
     this.setCanonicalUrl = function(path) {
         path = path || "";
         this.head.canonical_url = ConfigService.website_url() + "/" + path;
     }
-    
+
     this.login = function() {
         this.setTitle("Sign In");
         return true;
     };
-    
+
     this.search = function() {
         this.setTitle("Search");
         this.setDescription("Search for fashion on Bazaarr");
         this.setCanonicalUrl("search");
         return true;
     };
-    
+
     this.clip = function(type, params, page) {
         this.setTitle(params.description + " - Clip " + params.nid);
         this.setDescription(params.description + " - Clip " + params.nid);
         this.setCanonicalUrl("clip/" + params.nid);
         return true;
     };
-    
+
     this.user = function(type, params) {
         params.about = params.about || params.name + " on " + ConfigService.site_name;
         this.setTitle(params.name);
@@ -976,76 +1089,81 @@ angular.module('bazaarr').service('MetaService', function($rootScope, $location,
         this.setCanonicalUrl("user/" + params.name);
         return true;
     };
-    
+
     this.following = function(type, params) {
         this.setTitle(params.name + " following");
         this.setDescription("Followed by " + params.name);
         this.setCanonicalUrl("user/" + params.name + "/following");
         return true;
     };
-    
+
     this.followers = function(type, params) {
         this.setTitle(params.name + " followers");
         this.setDescription("Followers of " + params.name);
         this.setCanonicalUrl("user/" + params.name + "/followers");
         return true;
     };
-    
+
     this.clips = function(type, params, page) {
         // Add prev and next links for SEO
         if (type !== "following") {
+            if (angular.isDefined(params.state_param) && params.state_param) {
+                type = type + "/" + params.state_param;
+            }
+
             this.seo_cur_page  = parseInt($location.search().page) || 0;
             var prev_page = this.seo_cur_page === 0 ? 0 : this.seo_cur_page - 1;
             var next_page = this.seo_cur_page + 1;
+
             var page_name = params.account_page ? "account/" + AccountService.getAccountId() + "/" + type : type;
-            
+
             this.head.prev_href = this.seo_cur_page ? "#!/" + page_name : "";
             this.head.prev_href = prev_page ? this.head.prev_href + "?page=" + prev_page : this.head.prev_href;
-            
+
             this.head.next_href = next_page ? "#!/" + page_name + "?page=" + next_page : "";
         }
-        
+
         if (angular.isUndefined(this.clips[type])) {
             return false;
         }
-        
+
         return this.clips[type](this, params, page);
     };
-    
+
     this.clips.recent = function(that, params, page) {
         that.setTitle();
         that.setDescription();
         that.setCanonicalUrl();
         return true;
     };
-    
+
     this.clips.shop = function(that, params, page) {
         that.setTitle("Shop");
         that.setDescription("Shop for fashion items");
         that.setCanonicalUrl("shop");
         return true;
     };
-    
+
     this.clips.hashtag = function(that, params, page) {
         that.setTitle("Viewing: " + params.name);
         that.setCanonicalUrl("hashtags/" + params.name);
         return true;
     };
-    
+
     this.clips.clips = function(that, params, page) {
         that.setTitle(params.name + " clips");
         that.setDescription("Clips that the " + params.name + " clipped");
         that.setCanonicalUrl("user/" + params.name + "/clips");
         return true;
     };
-    
+
     this.clips.likes = function(that, params, page) {
         that.setTitle(params.name + " likes");
         that.setDescription("Clips that are liked by " + params.name);
         that.setCanonicalUrl("user/" + params.name + "/likes");
         return true;
     };
-    
+
     this.clips.collection_clips = function(that, params, page) {
         if (angular.isUndefined(params.bid)) {
             return false;

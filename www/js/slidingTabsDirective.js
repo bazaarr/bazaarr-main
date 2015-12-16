@@ -207,8 +207,6 @@ var slidingTabsDirective = angular.module("ionic").directive('ionSlideTabs', ['$
 
                 }
 
-                console.log(indicatorPos);
-
                 indicator.css({
                     "-webkit-transition-duration":"0ms",
                     "-webkit-transform":"translate(" + indicatorPos + "px,0px)",

@@ -1,0 +1,6 @@
+<ng-include ng-if="$state.includes('account.following-hashtags')" src="'views/menu/follow.html'"></ng-include>
+<div class="limit-width-600 tags-list">
+    <ion-list>
+        <hashtag-item ng-repeat="hashtag in hashtags" name="{{hashtag.name}}" view="{{view}}" class="hashtag-item"></hashtag-item>
+    </ion-list>
+</div>

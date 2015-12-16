@@ -1,7 +1,7 @@
 'use strict';
 angular.module('bazaarr').controller('ClipsCtrl',
 function($scope, $rootScope, $state, $timeout, $cacheFactory, $ionicPopup, $ionicScrollDelegate, $ionicPosition, $ionicNavBarDelegate, $ionicLoading, $ionicHistory,
-MenuService, ClipsService, SearchService, ClipService, UserService, CollectionService, ToastService, HttpService, FollowService, AccountService, MetaService,
+MenuService, ClipsService, SearchService, ClipService, UserService, CollectionService, ToastService, HttpService, FollowService, AccountService, MetaService, HashtagsService,
 clips) {
     /*$scope.$watch("clips", function(newValue, oldValue){
         p(newValue);
@@ -12,9 +12,6 @@ clips) {
 
     if (angular.isDefined(clips.data) && clips.data != null && clips.data.length) {
         $scope.clips = ClipsService.prepare(clips.data, "", true);
-
-        $scope.block_height = 0;
-        $scope.vis_clips    = $scope.clips;
 
         if (clips.data.length >= 10) {
             $timeout(function(){
@@ -50,12 +47,14 @@ clips) {
             $rootScope.head.next_href = "";
         }
     }
-    if ($state.includes("category") && angular.isDefined(clips.data) && angular.isDefined(clips.data[0])) {
-        $scope.title    = clips.data[0].category_name;
+
+    if ($state.includes("clips-by-color")) {
+        $scope.title    = 'Clips by color';
     }
+
     if ($state.includes("search-clips")) {
-        $scope.search = {};
-        $scope.search.search_api_views_fulltext = $state.params.query;
+        $scope.search = SearchService.params;//{};
+        //$scope.search.search_api_views_fulltext = $state.params.query;
     }
 
     $scope.swipeLeft = function() {
@@ -68,6 +67,9 @@ clips) {
 
     $scope.openClip = function(clip) {
         //$timeout(function() {
+        if (ClipService.isPrivate(clip)) {
+            return false;
+        }
         $state.go("clip", {clipId : clip.nid}).then(function() {
             //$ionicScrollDelegate.$getByHandle('clipSingle').scrollTop(true);
         });
@@ -100,10 +102,12 @@ clips) {
             clips.data = clips.data.concat(data.data);
             $scope.clips = ClipsService.prepare(data.data);
 
+            $scope.onScroll(true);
+
             $timeout(function(){
-                $scope.$broadcast('scroll.infiniteScrollComplete');
                 $scope.loading_more = false;
-            }, 500);
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+            }, 1000);
 
             if (data.data.length < 10) {
                 $scope.is_load_more = false;
@@ -143,56 +147,85 @@ clips) {
         return SearchService.isSearch();
     };
 
-    $scope.is_scroll = false;
+    $scope.is_scroll    = false;
+    $scope.pos_top      = 0;
 
-    $scope.onScroll = function() {
-        //return true;
+    $scope.onScroll = function(is_scroll) {
+        is_scroll = is_scroll || false;
 
-        if (clips.data.length < 30) {
+        // if count clips less than 61, return false
+        if (clips.data.length < 61) {
+            if (is_scroll) {
+                $scope.vis_clips = $scope.clips;
+                $timeout(function() {
+                    $ionicScrollDelegate.$getByHandle("clipList").resize();
+                });
+            }
             return false;
         }
 
-        if ($scope.is_scroll) {
+        // if scroll process or infinite loading, return false
+        if (($scope.is_scroll || $scope.loading_more) && !is_scroll) {
             return false;
         }
-
         $scope.is_scroll = true;
 
-        var pos = $ionicScrollDelegate.$getByHandle('clipList').getScrollPosition();
-        var pos_top = pos.top - 300;
-        var pos_bot = pos.top + window.innerHeight + 300;
-
-        var all_clips = $scope.clips;
-        var vis_clips = [];
-        var block_height    = 0;
-p(all_clips);
-        angular.forEach(all_clips, function(clips_row, i){
-            var height          = 0;
-            vis_clips[i]        = [];
-            angular.forEach(clips_row, function(clip, j){
-                //var clip_el = document.getElementById("clip-" + clip.nid);
-                height += all_clips[i][j].wrap_h;  //clip_el.offsetHeight;
-                if (height > pos_top && height < pos_bot) { // && all_clips[i][j].list_img === ""
-//p("Return: " + all_clips[i][j].img);
-                    vis_clips[i].push(all_clips[i][j]);
-                    block_height = block_height || height;
-                }
-                else if ((height < pos_top || height > pos_bot)) { // && all_clips[i][j].list_img !== ""
-//p("Remove: " + all_clips[i][j].img);
-                    //all_clips[i][j].list_img = '';
-                }
-            });
-        });
-
         $timeout(function() {
-            //$scope.$apply(function(){
-p(block_height);
-                $scope.block_height = block_height;
-                $scope.vis_clips    = vis_clips;
-            //});
+                // if scroll step less that device height, return false
+                var pos                     = $ionicScrollDelegate.$getByHandle('clipList').getScrollPosition(),
+                    device_height           = window.innerHeight,
+                    pos_top                 = pos.top - 2 * device_height > 0 ? pos.top - 2 * device_height : 0,
+                    pos_bot                 = pos.top + 3 * device_height;
+                if (Math.abs(pos.top - $scope.pos_top) < device_height && !is_scroll) {
+                    $scope.is_scroll = false;
+                    return false;
+                }
+                $scope.pos_top = pos.top;
+
+                var all_clips           = $scope.clips,
+                    vis_clips            = [],
+                    height               = [],
+                    top_block_height     = [],
+                    bottom_block_height  = [];
+
+//p("pos_top: " + pos_top);
+//p("pos_bot: " + pos_bot);
+            angular.forEach(all_clips, function(clips_row, i){
+                height[i]               = 0
+                top_block_height[i]     = 0,
+                bottom_block_height[i]  = 0;
+                vis_clips[i]            = [];
+                angular.forEach(clips_row, function(clip, j){
+                    height[i] += all_clips[i][j].wrap_h + 50;
+                    if (height[i] > pos_top && height[i] < pos_bot) {
+                        vis_clips[i].push(all_clips[i][j]);
+                    }
+                    else if (height[i] < pos_top) {
+                        top_block_height[i] += all_clips[i][j].wrap_h + 50; // = pos_top > 0 ? top_block_height[i] || height[i] : top_block_height[i];
+                    }
+                    else if (height[i] > pos_bot) {
+                        bottom_block_height[i] += all_clips[i][j].wrap_h + 50;
+                    }
+                });
+            });
+
+
+/*p("===========");
+p("top_block_height: " + top_block_height);
+p("bottom_block_height: " + bottom_block_height);
+p(vis_clips);*/
+            $scope.top_block_height         = top_block_height;
+            $scope.bottom_block_height      = bottom_block_height;
+            $scope.vis_clips                = vis_clips;
+
+            if (is_scroll) {
+                $timeout(function() {
+                    $ionicScrollDelegate.$getByHandle("clipList").resize();
+                });
+            }
 
             $scope.is_scroll = false;
-        }, 700);
+        }, 400);
     };
 
     $scope.doRefresh = function() {
@@ -212,7 +245,7 @@ p(block_height);
         ClipsService.pager[ClipsService.page_api_url] = 0;
         ClipsService.load(ClipsService.page_api_url, ClipsService.is_user_page, ClipsService.params).then(function(data) {
             $scope.clips = ClipsService.prepare(data.data, "", true);
-
+            $scope.onScroll(true);
             $rootScope.$broadcast('scroll.refreshComplete');
         });
     };
@@ -233,8 +266,10 @@ p(block_height);
             if (e.keyCode == 13 || search.search_api_views_fulltext.length > 1) {
 		SearchService.params = search;
                 SearchService.load().then(function(data) {
-			$scope.clips = ClipsService.prepare(data.data, "", true);
+                    $scope.clips = ClipsService.prepare(data.data, "", true);
+                    $scope.onScroll(true);
                 });
+                $state.go("search-clips", {query: search.search_api_views_fulltext}, {notify:false, reload:false});
             }
         });
     };
@@ -245,10 +280,12 @@ p(block_height);
         }
         if ($scope.$$phase) {
             $scope.clips = ClipsService.prepare(clips.data); //applyOrientation
+            $scope.onScroll(true);
         }
         else {
             $scope.$apply(function () {
                 $scope.clips = ClipsService.prepare(clips.data); //applyOrientation
+                $scope.onScroll(true);
             });
         }
         $ionicHistory.clearCache();
@@ -279,7 +316,7 @@ p(block_height);
     };
 
     $scope.backCondition = function() {
-        if($state.includes('collection') || $state.includes('hashtag')) {
+        if($state.includes('collection-view') || $state.includes('hashtag') || $state.includes('search-clips')) {
             $rootScope.back();
         }
     };
@@ -298,6 +335,12 @@ p(block_height);
                 {"bid" : $scope.collection.bid, "name" : $scope.title, "description" : $scope.collection.description, "user_name" : $scope.collection.user_name});
         });
     }
+
+    $scope.onScroll(true);
+
+    $scope.$on("scroll", function() {
+        $scope.onScroll();
+    });
 });
 
 angular.module('bazaarr').service('ClipsService',
@@ -336,7 +379,12 @@ function($rootScope, $state, $timeout, $location, $ionicLoading, HttpService, Ac
             this.account_page   = true;
         }
 
-        MetaService.set("clips", page, {"account_page" : this.account_page});
+
+        var meta_params = {};
+        /*meta_params.account_page = this.account_page;
+        meta_params.state_param = angular.isDefined(params[Object.keys(params)[0]]) ? params[Object.keys(params)[0]] : "";*/
+
+        MetaService.set("clips", page, meta_params);
 
         return this.loadAdapter(page, is_user_page, params);
     };
@@ -345,19 +393,23 @@ function($rootScope, $state, $timeout, $location, $ionicLoading, HttpService, Ac
         this.page_api_url   = page            || this.page_api_url;
         this.is_user_page   = is_user_page    || this.is_user_page;
 
+
         //Add id of collection to separate clips from different collections
         if (angular.isDefined(params) && angular.isDefined(params.bid)) {
-            this.page_api_url = this.page_api_url + "-" + params.bid;
+            this.page_api_url = this.page_api_url + "--" + params.bid;
         }
         if (angular.isDefined(params) && angular.isDefined(params.tid_raw)) {
-            this.page_api_url = this.page_api_url + "-" + params.tid_raw;
+            this.page_api_url = this.page_api_url + "--" + params.tid_raw;
+        }
+        if (angular.isDefined(params) && angular.isDefined(params.clip_colors_hex)) {
+            this.page_api_url = this.page_api_url + "--" + params.clip_colors_hex;
         }
 
-        HttpService.view_url = this.page_api_url.replace(/\-\d+/gi, "");
+        HttpService.view_url = this.page_api_url.replace(/\-\-\w+/gi, "");
         HttpService.page     = this.pager[this.page_api_url] || MetaService.seo_cur_page;
         HttpService.is_auth  = "following" === page ? true : false;//this.is_user_page ? true : false;
         HttpService.params   = params || this.params;
-        
+
         if (this.is_user_page) {
             HttpService.params.uid = AccountService.getAccountId();
         }
@@ -654,6 +706,10 @@ p(str);*/
     };
 
     this.updateClipInList = function(clip) {
+        if (angular.isUndefined(this.clips[clip.page_list]) || angular.isUndefined(this.clips[clip.page_list][clip.index])) {
+            return false;
+        }
+
         this.clips[clip.page_list][clip.index] = clip;
     };
 });

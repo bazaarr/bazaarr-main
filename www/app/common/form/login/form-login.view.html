@@ -1,0 +1,16 @@
+<div class="list">
+    <label class="item item-input">
+        <span class="input-label">Username</span>
+        <input type="text" ng-model="user.username" ng-keypress="checkKey($event)">
+    </label>
+    <label class="item item-input">
+        <span class="input-label">Password</span>
+        <input type="password" ng-model="user.password" ng-keypress="checkKey($event)">
+    </label>
+</div>
+<div>
+    <button class="button button-block button-dark login-btn" ng-click="signIn(user)">
+        Sign In
+    </button>
+</div>
+<div class="login-button-fb text-center"><a ng-click="fbLogin()">Log In with Facebook</a></div>

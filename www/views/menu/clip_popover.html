@@ -3,10 +3,10 @@
         <ion-item ng-if="isOwner()" ng-click="clipActionEdit(clip.nid)">
             Edit
         </ion-item>
-        <ion-item ng-if="!isReport()" ng-click="clipActionBlock()">
+        <ion-item ng-if="!isOwner() && !isReport()" ng-click="clipActionBlock()">
             Block
         </ion-item>
-        <ion-item ng-if="isReport()" ng-click="clipActionBlock()">
+        <ion-item ng-if="!isOwner() && isReport()" ng-click="clipActionBlock()">
             Unblock
         </ion-item>
         <!--

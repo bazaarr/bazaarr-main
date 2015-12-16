@@ -36,7 +36,11 @@
     },
     "org.apache.cordova.device",
     "org.apache.cordova.network-information",
-    "org.apache.cordova.inappbrowser"
+    "org.apache.cordova.inappbrowser",
+    {
+      "locator": "https://github.com/whiteoctober/cordova-plugin-app-version.git",
+      "id": "cordova-plugin-app-version"
+    }
   ],
   "cordovaPlatforms": [
     "android",

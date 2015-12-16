@@ -2,25 +2,21 @@
 
 angular.module('bazaarr').controller('AddClipCtrl',
 function($scope, $state, $q, $timeout, $window, $interval, $cordovaCamera, $cordovaInAppBrowser, $ionicPopup, $rootScope, $ionicLoading, $ionicScrollDelegate,
-UserService, AddClipService, DeviceAdapterService, CollectionService, ClipService, AccountService, ClipsService, 
+UserService, AddClipService, DeviceAdapterService, CollectionService, ClipService, AccountService, ClipsService,
 ToastService, HttpService, ImageService, ValidateService) {
     if (!UserService.is_login) {
-        
+
         if($state.includes('reclip')) {
             UserService.post_login.redirect     = "reclip";
             UserService.post_login.params       = {clipId : $state.params.clipId};
 
             ToastService.showMessage("danger", "Please sign in to make reclips");
         }
-        
+
         $state.go('login');
         return false;
     }
     var defaultClip = {
-        category: {
-            tid: '_none',
-            name: 'None'
-        },
         node: {
             currency: 'USD'
         }
@@ -30,25 +26,19 @@ ToastService, HttpService, ImageService, ValidateService) {
 
     $scope.allCurrency = currency;
 
-    $scope.categories = [];
-    
     $scope.old_bid = 0;
 
     $scope.clip = angular.copy(defaultClip);
 // p($scope.clip);
-    CollectionService.load(UserService.user.uid).then(function(data){
+    CollectionService.load2().then(function(data){
         $scope.collections = data.data;//CollectionService.user_collections;
         var default_collection = Object.keys(CollectionService.add_clip_collection).length ? CollectionService.add_clip_collection : data.data[0];
         CollectionService.add_clip_collection = {};
-        
+
         if (angular.isUndefined($scope.clip.node.ph_bid) || $scope.clip.node.ph_bid === '') {
             $scope.setCollection(default_collection.bid, default_collection.name);
         }
         $ionicScrollDelegate.resize();
-    });
-
-    CollectionService.getCategories(2).then(function(data){
-        $scope.categories = data.data;
     });
 
     $scope.deleteClip = function(nid) {
@@ -64,19 +54,19 @@ ToastService, HttpService, ImageService, ValidateService) {
                     //$scope.clip         = angular.copy(defaultClip);
                     $scope.image_src    = null;
                     HttpService.clearCache();
-                    
+
                     CollectionService.clear($scope.clip.node.collection_id);
-                    
-                    if (angular.isDefined($rootScope.backState[$rootScope.backState.length - 1]) 
+
+                    if (angular.isDefined($rootScope.backState[$rootScope.backState.length - 1])
                             && $rootScope.backState[$rootScope.backState.length - 1].state === "clip") {
                         $rootScope.backState.pop();
                     }
                     $rootScope.back();
-                    
+
                     AddClipService.postProcessClipDelete($scope.clip.node.ph_bid);
                 },
                 function(reason) {
-                    $scope.err_mess = reason.data;
+                    ToastService.showMessage("danger", reason.data);
                 });
             } else {
 
@@ -146,14 +136,9 @@ ToastService, HttpService, ImageService, ValidateService) {
 
             var node = {
                 node: {
-                    nid:            clip.node.nid,
-                    uid:            clip.node.uid,
-                    type:           'clip',
-                    /*field_category: {
-                        und: {
-                            values: clip.category.tid || 0
-                        }
-                    },*/
+                    nid:                clip.node.nid,
+                    uid:                clip.node.uid,
+                    type:               'clip',
                     ph_bid:             clip.node.ph_bid,
                     body_value:         clip.node.body_value,
                     title:              clip.node.title,
@@ -165,37 +150,31 @@ ToastService, HttpService, ImageService, ValidateService) {
                     send_to_facebook:   parseInt(clip.node.send_to_facebook)
                 }
             }
-			
-            if (angular.isDefined(clip.category.tid) && clip.category.tid) {
-                node.node.field_category            = {};
-                node.node.field_category.und        = {}
-                node.node.field_category.und.values = clip.category.tid;
-            }
 
             AddClipService.saveClip(node).then(function(data){
                 ToastService.showMessage("success", "Clip successfully saved");
-                
+
                 $scope.image_src = null;
-                
+
                 //after editing clip, load data from server, not from clip_list
                 ClipService.load_from_server        = true;
 
                 //update full clip view and other views with this clip
                 HttpService.clearCache();
-                
+
                 AddClipService.postProcessClipUpdate(clip.node.ph_bid, $scope.old_bid);
                 if (clip.node.ph_bid !== $scope.old_bid) {
                     CollectionService.updateCollectionField($scope.old_bid, "clips_count", -1, "increment");
                     CollectionService.updateCollectionField(clip.node.ph_bid, "clips_count", 1, "increment");
                 }
-                
+
                 //update cover of collection
                 if (parseInt(clip.node.is_cover)) {
                     CollectionService.updateCollectionField(clip.node.ph_bid, "cover_img", clip.node.img_large, "update");
                 }
-                
+
                 $rootScope.back();
-                
+
                 $ionicLoading.hide();
             }, function(reason) {
                 $ionicLoading.hide();
@@ -208,22 +187,19 @@ ToastService, HttpService, ImageService, ValidateService) {
             clip.node.type              = "clip";
             clip.node.field_clip_image  = {"und" : [{"fid" : data.data.fid}]};
             clip.node.img_large         = data.data.url;
-            
-            if(clip.category) {
-                clip.node.field_category  = {"und" : {"values" : clip.category.tid}};
-            }
-            delete clip.category;
+
             delete clip.currency;
-			
+
             AddClipService.saveClip(clip).then(function(data){
                 //$scope.clip = angular.copy(defaultClip);
                 $scope.image_src = null;
 
                 if (!DeviceAdapterService.is_ready) {
-                    var canvas = document.getElementById('canvas');
+                    /*var canvas = document.getElementById('canvas');
                     if (angular.isDefined(canvas)) {
                         canvas.style.display    = 'none';
-                    }
+                    }*/
+                    document.getElementById('canvas_wrapp').innerHTML = "";
                 }
 
                 AccountService.updateCounts();//updateCounts('clips_count', 1);
@@ -234,9 +210,9 @@ ToastService, HttpService, ImageService, ValidateService) {
                 $rootScope.backEvent = true;
                 $rootScope.backState.push({'state' : 'recent'});
                 $state.go('clip', {clipId: data.data.nid});
-                
+
                 AddClipService.postProcessClipInsert(clip.node.ph_bid, data.data.nid);
-                
+
                 //update cover of collection
                 if (parseInt(clip.node.is_cover)) {
                     CollectionService.updateCollectionField(clip.node.ph_bid, "cover_img", clip.node.img_large, "update");
@@ -294,19 +270,20 @@ ToastService, HttpService, ImageService, ValidateService) {
 
     $scope.reclipClip = function(clip, bid, cacheClean) {
         if(!clip){
+            $rootScope.backEvent = true;
             $state.go('add-collection', {action:'reclip', clipId: $state.params.clipId});
             return false;
         }
         $ionicLoading.show();
         var reclip = ClipService.formatReclip(clip, bid);
-        AddClipService.addReclip(reclip).then(function(data){
+        AddClipService.addReclip(reclip, clip.collection_id).then(function(data){
             ToastService.showMessage("success", "Reclip succesfully added");
             $scope.reclip = {};
             HttpService.clearCache();
             $ionicLoading.hide();
-            
+
             $rootScope.back();
-            
+
             AddClipService.postProcessClipInsert(bid);
         },
         function(reason) {
@@ -320,9 +297,9 @@ ToastService, HttpService, ImageService, ValidateService) {
 
     var clipit_loop 		= 0;
     var button_added 		= false;
-    
+
     var ref = {};
-    
+
     $scope.openUrlPopup = function() {
         $scope.photo_source_popup.close();
         /*$scope.url = {};
@@ -363,14 +340,14 @@ ToastService, HttpService, ImageService, ValidateService) {
             ref.removeEventListener('loaderror');
             ref.removeEventListener('exit');
         });
-		
+
 		//ref.show();
         /*$cordovaInAppBrowser.open("https://google.com", "_blank", DeviceAdapterService.getInAppBrowserConfig())
         .then(function(event) {
-			
+
         });*/
     };
-    
+
     /*$rootScope.$on('$cordovaInAppBrowser:loadstart', function(e, event){
         button_added = false;
         clearInterval(clipit_loop);
@@ -396,7 +373,7 @@ ToastService, HttpService, ImageService, ValidateService) {
     function addClipItBtn() {
         button_added = false;
         clearInterval(clipit_loop);
-        
+
         $timeout(function(){
             ref.insertCSS({
                 code: '.bazaarr-clip-it{width:100%;top:100%;position:fixed;bottom:0;padding:0;box-sizing:border-box;z-index:99999;background:#fff;}.bazaarr-clip-it.expanded{top:0; overflow-y: scroll;} .bazaarr-clip-it.expanded > span {display: none;} .images-list {text-align: center; padding-top: 46px;}.bazaarr-clip-it .cancel-btn{display:none}.bazaarr-clip-it.expanded .cancel-btn{display:block;position:absolute;top:0;right:0;font-size:20px;padding:10px;color:#43a5a6;text-decoration:none}.bazaarr-clip-it span{display:block;position:fixed;bottom:0;left:0;font-size:22px;background:#43a5a6;color:#FFF;text-align:center;text-decoration:none;width:100px;padding:10px;margin:20px;box-sizing:border-box}.bazaarr-clip-it img{  margin: 0 1%; max-width: 48%; margin-top: 20px;} .bazaarr-clip-it.expanded .error-message {font-size: 16px; max-width: 80%; margin: 0 auto;}'
@@ -412,7 +389,7 @@ ToastService, HttpService, ImageService, ValidateService) {
                 }, 500);
             });
         }, 1500);
-        
+
         clipit_loop = setInterval(function() {
             if (button_added) {
                 //alert("check");
@@ -456,7 +433,7 @@ ToastService, HttpService, ImageService, ValidateService) {
             });
         });*/
     }
-    
+
     function setClipFromWeb(clip) {
     	$scope.selectWebImage(clip.img);
         $scope.clip.node.source_url = clip.url.substring(0, 255);
@@ -507,18 +484,6 @@ ToastService, HttpService, ImageService, ValidateService) {
             $scope.clip.node.ph_bid         = $scope.clip.node.collection_id;
             $scope.clip.node.ph_bid_title   = $scope.clip.node.collection_name;
             $scope.clip.node.body_value     = $scope.clip.node.desc;
-            $scope.clip.category.tid        = $scope.clip.node.category.tid || null;
-
-            if ($scope.clip.category.tid !== null && $scope.clip.category.tid) {
-                //TODO: broadcast category name
-                $timeout(function(){
-                    angular.forEach($scope.categories, function(value, key) {
-                        if (value.tid === $scope.clip.category.tid) {
-                            $scope.clip.category.name = value.name;
-                        }
-                    });
-                }, 1000);
-            }
 
             $scope.clip.node.currency       = $scope.clip.node.currency.code;
             $scope.clip.node.price_value    = parseFloat($scope.clip.node.price) || "";
@@ -526,7 +491,7 @@ ToastService, HttpService, ImageService, ValidateService) {
     }
 
     function setCanvasImage(element, _url){
-        var canvas      = document.getElementById('canvas'),
+        /*var canvas      = document.getElementById('canvas'),
             MAX_WIDTH   = document.getElementById('canvas_wrapp').clientWidth,
             img         = new Image();
 
@@ -553,7 +518,33 @@ ToastService, HttpService, ImageService, ValidateService) {
 
             ctx.drawImage(img, 0, 0, img.width, img.height);
             url.revokeObjectURL(src);
-        };
+        };*/
+        document.getElementById('canvas_wrapp').innerHTML = "";
+        var orientation = false;
+        loadImage.parseMetaData(element.files[0], function (data) {
+            if (data.exif) {
+                orientation = data.exif.get('Orientation') || false;
+            }
+            loadImage(
+                element.files[0],
+                function (img) {
+                    $scope.file.file = img.toDataURL();
+
+                    var width = document.getElementById('canvas_wrapp').clientWidth;
+                    img.style.width = width + "px";
+                    img.style.height = (img.height * width / img.width) + "px";
+                    document.getElementById('canvas_wrapp').appendChild(img);
+                },
+                {
+                    maxWidth: 1000,
+                    maxHeight: 1000,
+                    canvas: true,
+                    orientation: orientation
+                }
+            );
+        });
+
+
     }
 
     function searchImages(url) {
@@ -605,7 +596,7 @@ ToastService, HttpService, ImageService, ValidateService) {
     };
 });
 
-angular.module('bazaarr').service('AddClipService', function($q, $ionicLoading, HttpService, ImageService) {
+angular.module('bazaarr').service('AddClipService', function($q, $ionicLoading, HttpService, ImageService, CollectionService) {
 
     this.deleteClip = function(nid) {
         HttpService.view_url = "node/" + nid;
@@ -613,11 +604,17 @@ angular.module('bazaarr').service('AddClipService', function($q, $ionicLoading, 
         return HttpService.dell();
     }
 
-    this.addReclip = function(params) {
+    this.addReclip = function(params, from_ph_bid) {
         HttpService.view_url = "reclip";
         HttpService.params   = params;
 
-        return HttpService.post();
+        var promise = HttpService.post();
+        promise.then(function(data) {
+            CollectionService.updateCollectionField(from_ph_bid, "count_reclips", 1, "increment");
+            HttpService.clearHttpCache("collection-reclips", "users-recliped-clip");
+        });
+
+        return promise;
     };
 
     this.saveClip = function(clip) {
@@ -666,12 +663,12 @@ angular.module('bazaarr').service('AddClipService', function($q, $ionicLoading, 
 
         return promise;
     };
-    
+
     this.postProcessClipInsert = function(bid, nid) {
         var data = {"action" : "insert", "nid" : nid};
         this.postProcessClip(bid, data);
     };
-    
+
     this.postProcessClipUpdate = function(bid, old_bid) {
         if (bid === old_bid) {
             return false;
@@ -679,13 +676,15 @@ angular.module('bazaarr').service('AddClipService', function($q, $ionicLoading, 
         var data = {"action" : "update", "old_bid" : old_bid};
         this.postProcessClip(bid, data);
     };
-    
+
     this.postProcessClipDelete = function(bid) {
         var data = {"action" : "delete"};
         this.postProcessClip(bid, data);
     };
-    
+
     this.postProcessClip = function(bid, data) {
+        return false;
+
         HttpService.view_url = "collection/collection_image/" + bid;
         HttpService.params   = {"data": data};
         HttpService.post();
@@ -746,7 +745,7 @@ angular.module('bazaarr').service('ImageService', function($q, $ionicLoading, De
             canvas.height = img.height;
             canvas.width = img.width;
             ctx.drawImage(img, 0, 0);
-            
+
             var toDataURLFailed = false;
             try {
             	dataURL = canvas.toDataURL("image/jpeg", 1);
@@ -760,11 +759,11 @@ angular.module('bazaarr').service('ImageService', function($q, $ionicLoading, De
                     var encoder = new JPEGEncoder();
                     dataURL = encoder.encode(ctx.getImageData(0, 0, img.width, img.height), 100);
             	}
-                catch(e) { 
+                catch(e) {
                 	def.reject({'data' : 'Error uploading image'});
                 }
             }
-            
+
             //dataURL = canvas.toDataURL();
             //dataURL = dataURL.replace("data:image/png;base64,", "data:image/jpeg;base64,");
             def.resolve(dataURL);

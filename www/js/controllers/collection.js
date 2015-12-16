@@ -130,7 +130,7 @@ function($scope, $rootScope, $state, $ionicHistory, CollectionService, FollowSer
 });
 
 angular.module('bazaarr').controller('CollectionListCtrl',
-function($scope, $rootScope, $state, $timeout, $ionicHistory, $ionicPosition, $ionicScrollDelegate, 
+function($scope, $rootScope, $state, $timeout, $ionicHistory, $ionicPosition, $ionicScrollDelegate,
 CollectionService, FollowService, AccountService, ToastService, HttpService, collections) {
     /*if (!UserService.is_login) {
         $state.go('login');
@@ -138,8 +138,8 @@ CollectionService, FollowService, AccountService, ToastService, HttpService, col
     }*/
 
     setCollections(collections);
-    
-    setCover(0); 
+
+    setCover(0);
     $timeout(function() {
         setPositions();
     });
@@ -215,27 +215,27 @@ CollectionService, FollowService, AccountService, ToastService, HttpService, col
             $rootScope.$broadcast('scroll.refreshComplete');
         });
     };
-    
+
     $scope.changeCollection = function(index) {
         setCover(index);
     };
-    
+
     $scope.getCover = function() {
         return {'background-image': 'url(' + $scope.cover_img + ')'};
     }
-    
+
     var already_scroll = false;
     $scope.scrollCollections = function() {
         if (already_scroll) {
             return false;
         }
         already_scroll = true;
-        
+
         $timeout(function() {
             setNearestCollection($ionicScrollDelegate.getScrollPosition().top);
         }, 1000);
     }
-    
+
     $scope.accept_collection = function(coll, type) {
         var index           = this.$parent.$parent.$parent.$index,
             parent_index    = this.$parent.$parent.$parent.$parent.$index,
@@ -262,7 +262,7 @@ CollectionService, FollowService, AccountService, ToastService, HttpService, col
             HttpService.clearCache();
         });
     };
-    
+
     var collection_top_positions = [];
     function setPositions() {
         var collection_elements = document.querySelectorAll(".collection");
@@ -271,7 +271,7 @@ CollectionService, FollowService, AccountService, ToastService, HttpService, col
         });
         collection_top_positions.push(100000);
     }
-    
+
     function setNearestCollection(scroll_pos) {
 //p(scroll_pos);
         var find_nearest = false;
@@ -306,9 +306,11 @@ CollectionService, FollowService, AccountService, ToastService, HttpService, col
         }
         $scope.collections = CollectionService.prepare(collections.data);
     }
-    
+
     function setCover(index) {
-        $scope.cover_img = $scope.collections[index].cover_img;
+        if($scope.collections[index]) {
+            $scope.cover_img = $scope.collections[index].cover_img;
+        }
     }
 
     $scope.$on('collections:follow', function(event, args) {
@@ -339,10 +341,6 @@ CollectionService, AccountService, CollSharedService, HttpService, UserService, 
             CollectionService.tmp_collection = {};
         }
     }
-    
-    CollectionService.getCategories(2).then(function(data){
-        $scope.categories = data.data;
-    });
 
     if(angular.isUndefined(CollectionService.tmp_collection) || angular.isUndefined(CollectionService.tmp_collection.bid)){
         CollectionService.tmp_collection = {
@@ -526,6 +524,7 @@ CollectionService, AccountService, CollSharedService, HttpService, UserService, 
                 $scope.popup = $ionicPopup.show({
                     title: 'Who can add clips',
                     templateUrl: 'views/popups/inputs/collection-can-add.html',
+                    cssClass: 'scroll-list',
                     scope: $scope,
                     buttons: [{
                         text: 'Cancel'
@@ -599,6 +598,7 @@ CollectionService, AccountService, CollSharedService, HttpService, UserService, 
                 }
                 CollectionService.addCollectionCallback($scope.collection);
             }
+            $scope.collection = [];
             HttpService.addNoCache('user_collections');
         }, function(reason) {
             ToastService.showDrupalFormMessage("danger", reason.data);
@@ -627,32 +627,37 @@ CollectionService, AccountService, CollSharedService, HttpService, UserService, 
     // CollSharedService
 });
 
-angular.module('bazaarr').controller('CollectionCoverCtrl', 
-function($scope, $rootScope, $state, $timeout, collection, FollowService, CollectionService, HttpService, ToastService, ClipsService, ClipService) {
+angular.module('bazaarr').controller('CollectionCoverCtrl',
+function($scope, $rootScope, $state, $timeout, collection, FollowService, CollectionService,
+         HttpService, ToastService, ClipsService, ClipService, CollSharedService, AccountService) {
     $scope.collection = CollectionService.collections[$state.params.colId]; //collection.data[0];
-    
+
     //CollectionService.getCounters($state.params.colId);
-    
+
     $scope.openClip = function(clipId) {
         if (angular.isUndefined(clipId)) {
             ToastService.showMessage("danger", "No clips in this collection");
             return false;
         }
-        
+
         ClipsService.load("collection_clips", false, {bid : $state.params.colId}).then(function(data) {
             ClipsService.prepare(data.data, "", true);
             ClipService.page_list       = ClipsService.page_api_url;
             $state.go("clip", {"clipId" : clipId});
         });
     };
-    
-    $scope.followCollection = function(bid, type) {
-        var send_type       = (1 === type) ? 0 : 1;
 
-        FollowService.followCollection(bid, send_type).then(function(data){
-            $scope.collection.follow = send_type;
-            FollowService.followCollectionCallback(data.data.user_follow);
-        });
+    $scope.followCollection = function(bid, type) {
+        if(AccountService.account_id) {
+            var send_type       = (1 === type) ? 0 : 1;
+
+            FollowService.followCollection(bid, send_type).then(function(data){
+                $scope.collection.follow = send_type;
+                FollowService.followCollectionCallback(data.data.user_follow);
+            });
+        } else {
+            $state.go('login');
+        }
     };
 
     $scope.accept_collection = function(coll, type) {
@@ -669,7 +674,7 @@ function($scope, $rootScope, $state, $timeout, collection, FollowService, Collec
             ToastService.showMessage("success", data.data.messages.status[0]);
         });
     };
-    
+
     $scope.addClipFromCollection = function(collection) {
         CollectionService.add_clip_collection = collection;
         $state.go("add");
@@ -678,26 +683,49 @@ function($scope, $rootScope, $state, $timeout, collection, FollowService, Collec
     $scope.goEditCollection = function(bid) {
         $state.go("edit-collection", {collectionId : bid});
     };
-    
+
     $scope.$on('update:collection_titles', function(event, args) {
         if (angular.isDefined(CollectionService.collections[args.bid])) {
             $scope.collection   = CollectionService.collections[args.bid];
         }
     });
+
+    $scope.checkSharedAvatars = function(){
+        var ownersMax = parseInt((window.innerWidth - 100) / 60);
+        var showMoreButton = false;
+        var images = document.querySelectorAll('.collection-view .col-owner img');
+        var imagesCount = images.length;
+        if(imagesCount > ownersMax && imagesCount > 1) {
+            showMoreButton = true;
+        }
+        for(var i = 1; i < imagesCount; i++) {
+            if(i < ownersMax) {
+                images[i].style.display = 'inline-block';
+            } else {
+                images[i].style.display = 'none';
+            }
+        }
+        var buttonMore = document.querySelector('.col-owner .button-more');
+        if(showMoreButton) {
+            buttonMore.style.display = 'inline-block';
+        } else {
+            buttonMore.style.display = 'none';
+        }
+    };
+
+    $scope.$on('orientation:change', function(){
+        $scope.checkSharedAvatars();
+    });
+
+    angular.element(document).ready($scope.checkSharedAvatars);
 });
 
-angular.module('bazaarr').controller('InputCtrl', function($scope, $rootScope, $ionicPopup, $timeout, $cordovaKeyboard, ValidateService, ToastService) {
+angular.module('bazaarr').controller('InputCtrl',
+function($scope, $rootScope, $ionicPopup, $timeout, $state, $cordovaKeyboard, ValidateService, ToastService, AccountService) {
     $scope.openPopup = function(type, scope_var, value, title, buttons) {
         $scope.popup        = {};
         $scope.popup.model  = value;
         $scope.popup.add    = {};
-        
-        if (angular.isDefined($scope.$parent.$parent.clip) && angular.isDefined($scope.$parent.$parent.clip.category)) {
-            $scope.tid = $scope.$parent.$parent.clip.category.tid;
-        }
-        else if (angular.isDefined($scope.$parent.$parent.collection)) {
-            $scope.tid = $scope.$parent.$parent.collection.tid;
-        }
 
         if(type.indexOf('select') === 0) {
             var default_buttons = [{
@@ -725,36 +753,41 @@ angular.module('bazaarr').controller('InputCtrl', function($scope, $rootScope, $
                 {
                     text: '<i class="ion-checkmark"></i>',
                     onTap: function(e) {
+                        e.preventDefault();
                         if(angular.isDefined($scope.popup.add.validate)){
                             // switch($scope.popup.add.validate){
                             //     case 'current_pass':
                             //         break;
                             // }
-                            if(angular.isUndefined($scope.popup.add.current_pass) || !$scope.popup.add.current_pass || $scope.popup.add.current_pass == ''){
-                                ToastService.showMessage("danger", "Please set your password!");
+                            return AccountService.checkCurrentPass($scope.popup.add.current_pass).then(function() {
+                                setScope();
+                            }, function(reason) {
+                                return false;
+                            });
+                        }
+
+                        function setScope () {
+                            if (!ValidateService.validate($scope.popup.model, type, title)) {
                                 e.preventDefault();
-                                return;
+                                return false;
                             }
-                        }
-
-                        if (!ValidateService.validate($scope.popup.model, type, title)) {
-                            e.preventDefault();
-                            return false;
-                        }
-                        scope_var = scope_var.split(".");
-                        if(typeof scope_var[2] != 'undefined'){
-                            if(typeof $scope[scope_var[0]][scope_var[1]] == 'undefined') {
-                                $scope[scope_var[0]][scope_var[1]] = {};
+                            scope_var = scope_var.split(".");
+                            if(typeof scope_var[2] != 'undefined'){
+                                if(typeof $scope[scope_var[0]][scope_var[1]] == 'undefined') {
+                                    $scope[scope_var[0]][scope_var[1]] = {};
+                                }
+                                $scope[scope_var[0]][scope_var[1]][scope_var[2]] = $scope.popup.model;
+                            } else {
+                                $scope[scope_var[0]][scope_var[1]] = $scope.popup.model;
                             }
-                            $scope[scope_var[0]][scope_var[1]][scope_var[2]] = $scope.popup.model;
-                        } else {
-                            $scope[scope_var[0]][scope_var[1]] = $scope.popup.model;
+
+                            for(var i in $scope.popup.add){
+                                $scope[scope_var[0]][i] = $scope.popup.add[i];
+                            }
+                            $scope.popup.sel.close();
                         }
 
-                        for(var i in $scope.popup.add){
-                            $scope[scope_var[0]][i] = $scope.popup.add[i];
-                        }
-
+                        setScope();
                     }
                 }
             ]
@@ -815,15 +848,10 @@ angular.module('bazaarr').controller('InputCtrl', function($scope, $rootScope, $
         }
         $scope.popup.sel.close();
     }
-    $scope.popupCategorySelect = function(value, title) {
-        if (angular.isDefined($scope.clip)) {
-            $scope.clip.category = {tid: value, name: title};
-        }
-        if (angular.isDefined($scope.collection)) {
-            $scope.collection.tid               = value;
-            $scope.collection.category_name     = title;
-        }
+
+    $scope.goUserAccount = function(uid) {
         $scope.popup.sel.close();
+        $state.go('account.collections', {'userId' : uid});
     }
 });
 
@@ -882,24 +910,40 @@ function($rootScope, $state, $q, $timeout, localStorageService, AccountService, 
 
     this.singleLoad = function(bid) {
         if(this.collections[bid]){
+            if (this.isPrivate(this.collections[bid])) {
+                return $q.reject();
+            }
             return $q.when({"data": [this.collections[bid]]});
         }
-        
+
         HttpService.view_url = "user_collections";
         HttpService.params   = {"bid" : bid};
         HttpService.is_auth  = false;
         HttpService.cache    = false;
 
-        var promise = HttpService.get();
         var that    = this;
-        promise.then(function(data) {
+        return HttpService.get().then(function(data) {
+            if (that.isPrivate(data.data[0])) {
+                return $q.reject();
+            }
+
             that.collections[bid] = data.data[0];
             that.getCounters(bid);
+
+            return data;
         });
-        
-        return promise;
     };
-    
+
+    this.isPrivate = function(collection) {
+        if ((collection.access_view === "private" && collection.access_add.indexOf(parseInt(UserService.user.uid)) === -1)
+            || parseInt(collection.is_private) === 1) {
+            ToastService.showMessage("danger", "This is a private content. You have no access to view it.");
+            return true;
+        }
+
+        return false;
+    };
+
     this.load = function(uid) {
         var cur_uid = AccountService.account_id || UserService.user.uid;
         uid = uid || cur_uid;
@@ -918,19 +962,19 @@ function($rootScope, $state, $q, $timeout, localStorageService, AccountService, 
         HttpService.view_url = "get_user_collections/" + uid;
         // HttpService.params   = {"uid" : uid};
         HttpService.is_auth  = false;
-        
+
         var promise = HttpService.get();
         promise.then(function() {
             var account = AccountService.getAccount();
             MetaService.set("user", "", {"name" : account.name, "about" : account.about});
         });
-        
+
         return promise;
     };
 
     this.prepare = function(data) {
         var j = 0;
-        
+
         for (var i in data) {
             if(typeof data[i].accepted != 'undefined'){
                 data[i].accepted = parseInt(data[i].accepted);
@@ -963,14 +1007,15 @@ function($rootScope, $state, $q, $timeout, localStorageService, AccountService, 
             }
 
             this.collections[data[i].bid] = data[i];
+            HttpService.addNoCache("collection-counters/" + data[i].bid);
         }
-        
+
         return this.applyOrientation(data);
     };
-    
+
     this.applyOrientation = function(data) {
         var cols = this.getColsNumber();
-        
+
         return ClipsService.chunk_table(data, cols);
     };
 
@@ -987,7 +1032,7 @@ function($rootScope, $state, $q, $timeout, localStorageService, AccountService, 
 
         return cols;
     };
-    
+
     this.add = function(collection) {
         var method = "post";
         HttpService.view_url = "collection";
@@ -1007,14 +1052,6 @@ function($rootScope, $state, $q, $timeout, localStorageService, AccountService, 
         HttpService.view_url = "collection/" + bid;
 
         return HttpService.dell();
-    };
-
-    this.getCategories = function(vid){
-        HttpService.view_url    = "getCategories";
-        HttpService.is_auth     = false;
-        HttpService.params      = {};
-
-        return HttpService.get();
     };
 
     this.addCollectionCallback = function(collection) {
@@ -1052,14 +1089,15 @@ function($rootScope, $state, $q, $timeout, localStorageService, AccountService, 
         });
         return collections;
     };
-    
+
     this.updateCollectionField = function(bid, field, value, operation) {
-        if (!this.collections[bid] || !this.collections[bid][field]) {
+        if (angular.isUndefined(this.collections[bid]) || angular.isUndefined(this.collections[bid][field])) {
             return false;
         }
-        
+
         switch (operation) {
             case "increment":
+                value = parseInt(value) === 0 ? -1 : 1;
                 this.collections[bid][field] = parseInt(this.collections[bid][field]) + value;
                 break;
             case "update":
@@ -1067,25 +1105,25 @@ function($rootScope, $state, $q, $timeout, localStorageService, AccountService, 
                 break;
         }
     };
-    
+
     this.clear = function(bid) {
         if (!this.collections[bid]) {
             return false;
         }
-        
+
         delete this.collections[bid];
-        
+
         return true;
     };
-    
+
     this.getCounters = function(bid) {
         if (angular.isUndefined(this.collections[bid]) || angular.isDefined(this.collections[bid].count_clips)) {
             return false;
         }
-        
+
         HttpService.view_url    = "collection-counters/" + bid;
         HttpService.is_auth     = false;
-        
+
         var that = this;
         HttpService.get().then(function(data) {
             angular.extend(that.collections[bid], data.data);

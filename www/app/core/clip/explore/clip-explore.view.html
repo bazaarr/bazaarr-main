@@ -1,0 +1,8 @@
+<div>
+    <div on-tap="openClip(clip.nid)" class="clip-image" style="background-image: url('{{clip.img}}')">
+        <div class="clip-price" ng-if="clip.price > 0">{{clip.currency.symbol}}{{clip.price}} {{clip.currency.code}}</div>
+    </div>
+    <div on-tap="openClip(clip.nid)" class="clip-title">{{clip.title}}</div>
+    <div class="clip-owner"><span>{{clip.owner.name}}</span> - <span>{{clip.created}}</span></div>
+    <div class="clip-desc" ng-bind-html="clip.desc"></div>
+</div>

@@ -1,0 +1,14 @@
+<ion-list class="tags-list">
+    <ion-item ng-repeat="tag in tags">
+        <div class="row row-center">
+            <div class="col" on-tap="$state.go('hashtag', {'hashtagName' : tag.name})">
+                <div class="name">
+                    #{{tag.name}}
+                </div>
+                <div class="info">
+                    {{tag.clips_count}} clip{{tag.clips_count == 1 ? '' : 's'}}
+                </div>
+            </div>
+        </div>
+    </ion-item>
+</ion-list>

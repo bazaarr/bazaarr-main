@@ -15,7 +15,7 @@
                     <i ng-if="coll.is_shared && user.uid == coll.uid" class="col-icon ion-ios-people"></i>
                     <i ng-if="coll.access_view == 'private'" class="col-icon ion-locked"></i>
                 </div>
-                <div class="info-wrapper">
+                <div class="info-wrapper" ng-if="coll.clips_count">
                     {{coll.clips_count}} {{coll.clips_count > 1 ? " clips" : " clip" }}
                 </div>
             </div>

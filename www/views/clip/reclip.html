@@ -17,13 +17,21 @@
                 <div class="reclip-image">
                     <img src="{{image_src}}" id="clipImage" />
                 </div>
-                <label class="item item-input description">
-                    <textarea placeholder="Description" ng-model="reclip.desc" rows="4"></textarea>
+                <label class="item item-input edit-desc" ng-click="openPopup('full-text-edit', 'reclip.desc', reclip.desc, 'Description')" ng-controller="InputCtrl">
+                    <div class="row">
+                        <div class="col label">Description</div>
+                        <div class="col value text-right">{{reclip.desc}}</div>
+                        <div class="col col-10 text-right"><i class="ion-chevron-right"></i></div>
+                    </div>
                 </label>
-                <ion-toggle ng-if="::user.data.hybridauth.id" ng-model="reclip.send_to_facebook" toggle-class="toggle-calm" ng-true-value="'1'" ng-false-value="'0'">Post to Facebook</ion-toggle>
+                <facebook-post-toogle node="reclip"></facebook-post-toogle>
                 <ion-list class="collection-list">
                     <ion-item class="title">Add to existing collection</ion-item>
-                    <ion-item ng-class="clip.node.ph_bid == col.bid ? 'active' : ''" ng-repeat="col in collections" class="collection-item" on-tap="setCollection(col.bid, col.name)">{{col.name}}</ion-item>
+                    <ion-item ng-class="clip.node.ph_bid == col.bid ? 'active' : ''" ng-repeat="col in collections" class="collection-item" on-tap="setCollection(col.bid, col.name)">
+                        {{col.name}}
+                        <span ng-if="col.uid != user.uid"> shared from {{col.user_name}}</span><i ng-if="col.uid != user.uid" class="ion-ios-people"></i>
+                        <i ng-if="col.access_view == 'private'" class="ion-locked"></i>
+                    </ion-item>
                     <ion-item ng-click="reclipClip()" class="add-collection"><i class="icon ion-plus"></i> Add to a new Collection</ion-item>
                 </ion-list>
             </div>

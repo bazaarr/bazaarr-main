@@ -1,0 +1,37 @@
+{
+  "ProjectName": "Bazaarr Mobile App",
+  "ProjectGuid": "02b75eba-5315-4f9a-9e59-a29e5a2fe438",
+  "projectVersion": 1,
+  "AppIdentifier": "com.telerik.BazaarrMobileApp",
+  "DisplayName": "Bazaarr Mobile App",
+  "Author": "",
+  "Description": "Bazaarr Mobile App",
+  "BundleVersion": "1.0",
+  "AndroidVersionCode": "1",
+  "iOSDeviceFamily": [
+    "1",
+    "2"
+  ],
+  "iOSBackgroundMode": [],
+  "ProjectTypeGuids": "{070BCB52-5A75-4F8C-A973-144AF0EAFCC9}",
+  "FrameworkVersion": "3.5.0",
+  "AndroidPermissions": [],
+  "DeviceOrientations": [
+    "Portrait",
+    "Landscape"
+  ],
+  "AndroidHardwareAcceleration": "false",
+  "iOSStatusBarStyle": "Default",
+  "Framework": "Cordova",
+  "WP8TileTitle": "",
+  "WP8Publisher": "",
+  "WP8Capabilities": [],
+  "WP8Requirements": [],
+  "WP8PublisherID": "{2227c7da-ecce-4f54-994e-2390b3bd280e}",
+  "WP8ProductID": "{8b8614d1-7712-4e0b-b313-c83d82c4f2f7}",
+  "WP8SupportedResolutions": [
+    "ID_RESOLUTION_WVGA",
+    "ID_RESOLUTION_WXGA",
+    "ID_RESOLUTION_HD720P"
+  ]
+}

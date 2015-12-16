@@ -5,18 +5,18 @@
         </button>
     </ion-nav-buttons>
     <ion-nav-buttons side="secondary">
-        <div ng-if="user.uid && user.uid == collection.uid" class="col actions">
+        <div ng-if="user.uid && user.uid == collection.uid || collection.accepted=='1'" class="col actions">
+            <button class="cover-btn" ng-if="collection.uid!=user.uid" ng-click="accept_collection(collection, collection.accepted=='1' ? 3 : 0)">
+                Remove
+            </button>
+            <button on-tap="goEditCollection(collection.bid)" class="cover-btn" ng-if="collection.accepted != '1'">
+                <i class="ion-edit"></i>
+            </button>
             <button on-tap="addClipFromCollection(collection)" class="cover-btn">
                 <i class="ion-plus-round"></i>
             </button>
-            <button on-tap="goEditCollection(collection.bid)" class="cover-btn">
-                <i class="ion-edit"></i>
-            </button>
         </div>
-        <button class="cover-btn" ng-if="collection.uid!=user.uid && collection.accepted=='1'" ng-click="accept_collection(collection, collection.accepted=='1' ? 3 : 0)">
-            Remove
-        </button>
-        <button class="cover-btn" ng-if="collection.uid!=user.uid"
+        <button class="cover-btn" ng-if="collection.uid!=user.uid && !collection.accepted"
                 ng-click="followCollection(collection.bid, collection.follow)">
             <div ng-if="collection.follow">
                 Unfollow
@@ -27,7 +27,8 @@
         </button>
     </ion-nav-buttons>
     
-    <ion-content class="padding collection-view" scroll="false" has-bouncing="false" has-header="true" has-tabs="true" on-swipe-right="back()">
+    <ion-content class="padding collection-view" scroll="false" has-bouncing="false" has-header="true" has-tabs="true"
+                 on-swipe-right="back()" on-swipe-left="openClip(collection.last_clip_id)">
         <div class="background-full-image-wrapper">
             <img class="background-full-image" ng-src="{{collection.cover_img}}">
         </div>
@@ -51,8 +52,12 @@
             <div class="col-desc">{{collection.description}}</div>
             
             <div class="col-owner">
-                <div class="name">By <span ng-repeat="owner in collection.owners">{{owner.name}}<span ng-if='!$last'>, </span></span></div>
-                <img ng-repeat="owner in collection.owners" on-tap="StateService.goAccount(owner.uid)" ng-src="{{owner.image}}" width="60" />
+                <div class="name">Members</div>
+                <div class="users">
+                    <img ng-repeat="owner in collection.owners" on-tap="StateService.goAccount(owner.uid)"
+                         ng-src="{{owner.image}}" width="60"/>
+                    <div class="button-more" ng-click="openPopup('users-list', $scope.collection.owners, $scope.collection.owners, 'Who can edit', [{text: 'Back'}]);" ng-controller="InputCtrl">...</div>
+                </div>
             </div>
             
             <div class="col-counters">

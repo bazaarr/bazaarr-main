@@ -1,0 +1,20 @@
+<ion-item>
+    <div class="hashtag-block" style="background-image: url('{{hashtag.clip_image.img_large}}')">
+        <div class="image-shadow">
+            <a class="name" href="#!/hashtag/{{hashtag.name}}">
+                <div class="horizontal-c">
+                    <div class="text">
+                        #{{hashtag.name}}
+                    </div>
+                </div>
+            </a>
+            <div class="f-button" ng-if="::view === 'account'">
+                <hashtag-follow-button name="{{hashtag.name}}"></hashtag-follow-button>
+            </div>
+            <a class="count" ng-if="::view === 'following'" href="#!/hashtag/{{hashtag.name}}">
+                {{hashtag.clips_count}} clips
+            </a>
+        </div>
+    </div>
+</ion-item>
+<div class="clearfix"></div>

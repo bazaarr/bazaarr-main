@@ -1,0 +1,19 @@
+<div class="brand-item">
+    <div class="brand-image" ng-click="$state.go('account.collections', {'userId' : brand.uid})">
+        <img ng-src="{{brand.img.big}}">
+    </div>
+    <div class="brand-rwrapper">
+        <div class="brand-rtop">
+            <div class="brand-name" ng-click="$state.go('account.collections', {'userId' : brand.uid})">
+                {{brand.name}}
+            </div>
+            <div class="brand-following" ng-click="followUser(brand.uid, brand.is_followed)">
+                <div class="horizontal-c {{brand.is_followed == true ? 'ion-ios-star' : 'ion-ios-star-outline'}}"></div>
+            </div>
+        </div>
+        <div class="brand-info vertical-c">
+            {{brand.desc}}
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>

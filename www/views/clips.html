@@ -1,14 +1,28 @@
 <ion-view view-title="{{title}}">
     <ion-nav-buttons side="primary">
-        <button class="button" ng-click="back()" ng-if="$state.includes('collection') || $state.includes('hashtag')">
+        <button class="button" ng-click="back()" ng-if="$state.includes('collection-view') || $state.includes('hashtag') || $state.includes('clips-by-color')">
             <i class="ion-chevron-left"></i>
         </button>
     </ion-nav-buttons>
     <ion-nav-buttons side="secondary">
-        <button class="button" ng-if="!isSearch()" ng-click="$state.go('search')">
-            <i class="ion-search"></i>
+        <button class="button refine" ng-controller="SearchCtrl" ng-if="isSearch()" ng-click="goSearch()">
+            Refine
         </button>
+        <button class="colors-search-indicator" ng-style="{'background' : '#' + $state.params.hex}"
+                ng-if="$state.includes('clips-by-color')"></button>
+        <hashtag-follow-button name="{{$state.params.hashtagName}}"></hashtag-follow-button>
     </ion-nav-buttons>
+
+    <ion-nav-bar class="bar bar-dark bar-header item-input-inset custom home-tabs">
+        <div ng-if="$state.current.name == 'recent' || $state.current.name == 'shop' || $state.current.name == 'explore' || $state.current.name == 'popular'">
+            <a href="#!/recent" ng-class="$state.current.name == 'recent' ? 'active' : ''">Recent</a>
+            <a href="#!/shop" ng-class="$state.current.name == 'shop' ? 'active' : ''">Shop</a>
+            <a href="#!/popular" ng-class="$state.current.name == 'popular' ? 'active' : ''">Popular</a>
+            <div class="clearfix"></div>
+        </div>
+
+        <menu-follow></menu-follow>
+    </ion-nav-bar>
 
     <div class="bar bar-dark bar-header item-input-inset search-bar" ng-if="$state.current.name == 'search-clips'">
         <button class="button" ng-click="back()">
@@ -31,8 +45,8 @@
         </div>
     </div>
 
-    <ion-content delegate-handle="clipList" has-header="true" has-tabs="true" on-swipe-right="backCondition()"> <!--  on-scroll="onScroll()" -->
+    <ion-content delegate-handle="clipList" on-scroll="onScroll()" on-swipe-right="backCondition()" delegate-handle="clipContent" has-header="true" has-tabs="true">
         <ion-refresher on-refresh="doRefresh()"></ion-refresher>
-        <ng-include src="'views/clip/list.html'">
+        <ng-include src="'views/clip/list.html'" />
     </ion-content>
 </ion-view>

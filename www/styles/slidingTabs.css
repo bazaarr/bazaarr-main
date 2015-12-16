@@ -1,0 +1,81 @@
+.slider {
+    height: 100%;
+}
+
+.slidingTabs {
+    height: 32px;
+    z-index: 10;
+    box-shadow: 0 0 4px #868686;
+}
+
+.slidingTabs .scroll {
+    height: auto;
+    min-width: 100%;
+    max-width: 100%;
+}
+
+.slidingTabs ul {
+    background-color: #fff;
+    height: 32px;
+    text-align: center;
+}
+
+.slidingTabs ul li {
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    display: inline-block;
+    margin: 0;
+    padding: 0 10px 2px 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #66C4E3;
+    -webkit-transition: color .25s ease-in-out;
+    transition: color .25s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+.slidingTabs ul li.tab-active {
+    color: #66C4E3;
+}
+
+/* Material Design is not necessary
+
+.slidingTabs ul li .ink {
+    display: block;
+    position: absolute;
+    background: rgba(56, 147, 245, 0.8);
+    border-radius: 100%;
+    transform: scale(0);
+}
+
+.slidingTabs ul li .ink.animate {
+    -webkit-animation: ripple 0.65s linear;
+    animation: ripple 0.65s linear;
+}
+
+*/
+
+.slidingTabs .tab-indicator-wrapper {
+    width: 100%;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.2);
+    -webkit-transform: translateY(-2px);
+    position: absolute;
+}
+
+.slidingTabs .tab-indicator-wrapper .tab-indicator {
+    height: 100%;
+    background-color: #66C4E3;
+    width: 70px;
+    position: relative;
+}
+
+@-webkit-keyframes ripple {
+    100% {
+        opacity: 0;
+        transform: scale(2.5);
+    }
+}

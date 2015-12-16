@@ -1,0 +1,10 @@
+<div class="slidingTabs-wrapper">
+    <div class="slidingTabs" ng-if="::active">
+        <ul>
+            <li class="slider-slide-tab ng-binding" on-tap="go(menu.state)"
+                ng-repeat="menu in ::menus" ng-class="::menu.is_active ? 'tab-active' : ''">
+                {{::menu.name}}
+            </li>
+        </ul>
+    </div>
+</div>

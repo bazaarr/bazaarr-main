@@ -8,9 +8,9 @@
     </div>
     <div class="main-menu-bg">
         <div class="menu-wrapper limit-width">
-            <a href="#!/recent" class="{{active[0]}}" ng-class="$state.current.name == 'recent' ? 'active' : ''">
-                <div class="icon ion-clock"></div>
-                <div class="label">Recent</div>
+            <a href="#!/explore" ng-class="$state.current.name == 'recent' || $state.current.name == 'shop' || $state.current.name == 'explore' || $state.current.name == 'popular'  ? 'active' : ''">
+                <div class="icon ion-home"></div>
+                <div class="label">Home</div>
             </a>
             <a ng-if='isLogin()' href="#!/following" class="{{active[1]}}">
                 <div class="icon ion-person-stalker"></div>
@@ -20,9 +20,9 @@
                 <div class="icon ion-person"></div>
                 <div class="label">Following</div>
             </a>
-            <a href="#!/shop" class="{{active[2]}}" ng-class="$state.current.name == 'shop' ? 'active' : ''">
-                <div class="icon ion-bag"></div>
-                <div class="label">Shop</div>
+            <a href="#!/search/" ng-class="$state.includes('search') ? 'active' : ''">
+                <div class="icon ion-search"></div>
+                <div class="label">Search</div>
             </a>
             <a ng-if='isLogin()' href="#!/account/{{user.uid}}/collections" ng-class="$state.params['userId'] == user.uid ? 'active' : ''">
                 <div class="icon ion-person"></div>

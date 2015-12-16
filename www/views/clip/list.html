@@ -1,4 +1,4 @@
-<div ng-if='collection' class="clip-list-subtitle">
+<!--div ng-if='collection' class="clip-list-subtitle">
     <div class="row collection-panel">
         <div class="col clips-count">
             {{collection.clips_count}} clips
@@ -41,13 +41,13 @@
             {{collection.description}}
         </div>
     </div>
-</div>
-<div ng-style="{'height' : block_height + 'px'}"></div>
+</div-->
 <div class="row clips-list">
-    <div class="col" ng-repeat="clip in clips">
+    <div class="col" ng-repeat="clip in vis_clips">
+        <div ng-style="{'height' : top_block_height[$index] + 'px'}"></div>
         <div class="clip-teaser" ng-repeat="cli in clip" id="clip-{{cli.nid}}" on-hold="onHold(cli)">
             <a href="#!/clip/{{cli.nid}}" ng-class="getBlockedClass(cli.bloked)" class="clip_img"
-                 ng-style="{'min-height': cli.wrap_h + 'px', 'background-color': '#' + cli.color[0].hex}">
+                 ng-style="{'height': cli.wrap_h + 'px', 'overflow' : 'hidden', 'background-color': '#' + cli.color[0].hex}">
                 <img ng-src="{{cli.list_img}}" width="100%" />
                 <div ng-if="cli.price > 0" class="price">
                     {{cli.currency.code == 'USD' ? cli.currency.symbol : ''}}{{cli.price}} {{cli.currency.code}}
@@ -72,6 +72,7 @@
                 </div>
             </a>
         </div>
+        <div ng-style="{'height' : bottom_block_height[$index] + 'px'}"></div>
     </div>
 </div>
-<ion-infinite-scroll ng-if="is_load_more" on-infinite="loadMore()" distance="25%"></ion-infinite-scroll>
+<ion-infinite-scroll ng-if="is_load_more" on-infinite="loadMore()" distance="20%"></ion-infinite-scroll>

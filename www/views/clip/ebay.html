@@ -5,7 +5,7 @@
         </button>
     </ion-nav-buttons>
     <ion-nav-buttons side="secondary">
-        <button ng-controller="ClipCtrl" class="button" ng-if="canReclip()" on-tap="clipActionReclip()">
+        <button ng-controller="ClipCtrl" class="button" ng-if="$parent.canReclip()" on-tap="clipActionReclip()">
             <i class="ion-scissors"></i>
         </button>
         <button ng-controller="ClipCtrl" class="button action-like" ng-if="clip.bloked !== 0" on-tap="clipActionLike()">
@@ -81,7 +81,7 @@
                     <div>{{product.Seller.UserID}} ({{product.Seller.FeedbackScore}})</div>
                     <div>{{product.Seller.PositiveFeedbackPercent}} Positive Feedback</div>
                 </div>
-                <div class="text-center original-link" on-tap="openInApp(feed_html.url, false, false)">View original source</div>
+                <div class="text-center original-link" on-tap="openInApp(product.ViewItemURLForNaturalSearch, false, false)">View original source</div>
             </div>
         </div>
     </ion-content>

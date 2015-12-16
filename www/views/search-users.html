@@ -16,7 +16,7 @@
     </div>
 
 
-    <ion-content delegate-handle="clipList" has-header="true" has-tabs="true" on-swipe-right="backCondition()" class="search-all">
+    <ion-content delegate-handle="clipList" has-header="true" has-tabs="true" on-swipe-right="back()" class="search-all">
         <div class="search-section users" ng-if="users.length > 0">
             <ion-list class="users-list">
                 <ion-item ng-repeat="user in users" on-tap="$state.go('account.collections', {'userId' : user.uid})">

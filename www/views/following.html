@@ -1,0 +1,31 @@
+<ion-view view-title="Following">
+    <ion-nav-buttons side="secondary">
+    </ion-nav-buttons>
+    <ion-content scroll="false" has-header="true" has-tabs="true" class="following-slides">
+        <menu-follow></menu-follow>
+        
+        <ion-slide-box delegate-handle="following-slidebox"  show-pager="false" ion-slide-tabs slide-tabs-scrollable="true">
+            <ion-slide ion-slide-tab-label="Clips">
+                <ion-content>
+                    <ion-refresher on-refresh="doRefresh()"></ion-refresher>
+                    <ng-include src="'views/clip/list.html'" />
+                </ion-content>
+            </ion-slide>
+            <ion-slide ion-slide-tab-label="Collections" class="following-collections">
+                <ion-content>
+                    <ng-include src="'views/user/collections.html'"></ng-include>
+                </ion-content>
+            </ion-slide>
+            <ion-slide ion-slide-tab-label="Tags">
+                <ion-content>
+                    <ion-list class="tags-list">
+                        <hashtag-item ng-repeat="tag in tags" name="{{tag.name}}" view="following"></hashtag-item>
+                    </ion-list>
+                </ion-content>
+            </ion-slide>
+            <ion-slide ion-slide-tab-label="Users">
+                <ng-include src="'views/user/follow.html'"></ng-include>
+            </ion-slide>
+        </ion-slide-box>
+    </ion-content>
+</ion-view>

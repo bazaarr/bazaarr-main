@@ -1,0 +1,26 @@
+<ion-view class="explore-view" title="Explore">
+    <ion-nav-bar class="bar bar-dark bar-header item-input-inset custom home-tabs">
+        <div>
+            <a href="#!/recent">Recent</a>
+            <a href="#!/shop">Shop</a>
+            <a href="#!/popular">Popular</a>
+            <div class="clearfix"></div>
+        </div>
+    </ion-nav-bar>
+
+    <ion-content has-header="true" has-tabs="true">
+        <div class="explore-block" ng-repeat="name in order">
+            <h2>{{titles[name].title}}</h2>
+            <div ng-if="name == 'brands'" class="horizontal-c">
+                <a href="#!/brands" class="show-all-button">Show all</a>
+            </div>
+            <div class="desc" ng-bind-html="titles[name].description"></div>
+            <div ng-if="name != 'brands'" ng-repeat="clip in explores[name].data | limitTo : count" class="clip-wrapper" ng-style="{'width' : width + '%', 'display' : 'inline-block', 'overflow' : 'hidden'}">
+                <clip-explore clip="clip" display="'explore-' + name" class="clip"></clip-explore>
+            </div>
+            <div ng-if="name == 'brands'" ng-repeat="brand in explores[name].data | limitTo : count">
+                <brand-item brand="brand"></brand-item>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

@@ -1,7 +1,7 @@
 'use strict';
 angular.module('bazaarr').controller('SearchCtrl',
 function($scope, $rootScope, $state, $timeout, $ionicTabsDelegate, $ionicHistory, $cordovaKeyboard,
-SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaService) {
+SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaService, HttpService) {
 
     var SEARCH_TAGS_COUNT  = 6,
         SEARCH_USERS_COUNT = 5,
@@ -10,9 +10,8 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
     $scope.resetSearchResults = function(is_manual) {
         $scope.search = {
             search_api_views_fulltext:  "",
-            price:                      ",",
+            price:                      "",
             price_title:                "All",
-            field_category:             "All",
             price_type:                 0,
             price_value:                0,
             type:                       0,
@@ -20,7 +19,8 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
             sort_order:                 "DESC",
             sort_order_title:           "Descending",
             sort_by:                    "created",
-            sort_by_title:              "Date"
+            sort_by_title:              "Date",
+            time_left:                  0
         };
 
         $scope.searchColors = [
@@ -94,7 +94,8 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
         ];
 
         $scope.users        = [];
-        $scope.tags        = [];
+        $scope.clips        = [];
+        $scope.tags         = [];
         $scope.collections  = [];
 
         if(is_manual) {
@@ -106,10 +107,6 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
     $scope.resetSearchResults();
     $scope.users        = [];
     $scope.collections  = [];
-
-    CollectionService.getCategories(2).then(function(data){
-        $scope.categories = data.data;
-    });
 
     if($state.params && $state.params.query) {
         $scope.search.search_api_views_fulltext = $state.params.query;
@@ -128,20 +125,20 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
             });
         }*/ else if ($state.current.name == 'search-tags') {
             SearchService.tagSearch($scope.search.search_api_views_fulltext, 30).then(function(data){
-                if(data.data.length > 0) {
+                /*if(data.data.length > 0) {
                     for(var i = 0; i < data.data.length; i++) {
                         data.data[i].name = data.data[i].name.substr(1, data.data[i].name.length);
                     }
-                }
+                }*/
                 $scope.tags = data.data;
             });
         } else if ($state.current.name == 'search') {
             SearchService.tagSearch($scope.search.search_api_views_fulltext, 30).then(function(data){
-                if(data.data.length > 0) {
+                /*if(data.data.length > 0) {
                     for(var i = 0; i < data.data.length; i++) {
                         data.data[i].name = data.data[i].name.substr(1, data.data[i].name.length);
                     }
-                }
+                }*/
                 $scope.tags = data.data;
             });
             SearchService.userSearch($scope.search.search_api_views_fulltext, SEARCH_USERS_COUNT).then(function(data){
@@ -192,20 +189,20 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
                     }*/ else if ($state.current.name == 'search-tags') {
                         SearchService.params = search;
                         SearchService.tagSearch(search.search_api_views_fulltext, 30).then(function(data){
-                            if(data.data.length > 0) {
+                            /*if(data.data.length > 0) {
                                 for(var i = 0; i < data.data.length; i++) {
                                     data.data[i].name = data.data[i].name.substr(1, data.data[i].name.length);
                                 }
-                            }
+                            }*/
                             $scope.tags = data.data;
                         });
                     } else if ($state.current.name == 'search') {
                         SearchService.tagSearch(search.search_api_views_fulltext, SEARCH_TAGS_COUNT).then(function(data){
-                            if(data.data.length > 0) {
+                            /*if(data.data.length > 0) {
                                 for(var i = 0; i < data.data.length; i++) {
                                     data.data[i].name = data.data[i].name.substr(1, data.data[i].name.length);
                                 }
-                            }
+                            }*/
                             $scope.tags = data.data;
                         });
                         SearchService.userSearch(search.search_api_views_fulltext, SEARCH_USERS_COUNT).then(function(data){
@@ -290,12 +287,12 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
             }
         }
 
-        if(type == 2 && $scope.search.price_value_1 > 0) {
+        /*if(type == 2 && $scope.search.price_value_1 > 0) {
             $scope.search.price_type = type;
-        } else {
+        } else {*/
             $scope.search.price_value_1 = to;
             $scope.search.price_type = type;
-        }
+        //}
     };
     $scope.selectSeachType = function(type) {
         $scope.search.type = type;
@@ -305,12 +302,19 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
         // console.log(e);
         $timeout(function() {
             if (e.keyCode == 13 || search.search_api_views_fulltext.length > 1) {
+                if(e.keyCode == 13) {
+                    unfocusSearch();
+                }
                 $scope.goSearchResults(search);
             }
         });
     };
 
     $scope.openClip = function(clip) {
+        if (ClipService.isPrivate(clip)) {
+            return false;
+        }
+
         ClipService.page_list = ClipsService.page_api_url;
         ClipService.preloadImage(clip.img_large);
         $state.go("clip", {clipId : clip.nid}).then(function() {
@@ -320,16 +324,17 @@ SearchService, ToastService, CollectionService, ClipsService, ClipService, MetaS
 
     $scope.saveFilters = function() {
         //$scope.clips = {};
-	$ionicHistory.clearCache();
-	$rootScope.backEvent = true;
-	delete $scope.search.search_api_views_fulltext;
+        HttpService.clearViewCache();
+        SearchService.page = 0;
+        $rootScope.backEvent = true;
+        delete $scope.search.search_api_views_fulltext;
         angular.extend(SearchService.params, $scope.search);
         $state.go('search-clips', {query: SearchService.params.search_api_views_fulltext});
-    }
+    };
 });
 
 angular.module('bazaarr').service('SearchService',
-function($state, $ionicLoading, UserService, server_url, HttpService, ClipsService, MetaService) {
+function($state, $ionicLoading, UserService, server_url, HttpService, ClipsService, MetaService, HashtagsService) {
     this.params = {};
 
     this.page = 0;
@@ -383,10 +388,17 @@ function($state, $ionicLoading, UserService, server_url, HttpService, ClipsServi
             HttpService.params.limit = limit;
         }
 
-        return HttpService.get();
+        var promise = HttpService.get();
+        promise.then(function(data) {
+            HashtagsService.setHashtags(data.data);
+        });
+        
+        return promise;
     }
 
     this.load = function() {
+        this.params.time_left = this.params.sort_by === "price_value" ? "now" : "0";
+
         HttpService.view_url        = 'views/solr_clip_search';
         HttpService.page            = this.page;
         HttpService.params          = this.params;
@@ -406,6 +418,9 @@ function($state, $ionicLoading, UserService, server_url, HttpService, ClipsServi
 
         var ret = HttpService.get();
         ret.then(function(data) {
+            if ($state.includes("search")) {
+                ClipsService.prepare(data.data, "search", true);
+            }
             //$ionicLoading.hide();
         })
 

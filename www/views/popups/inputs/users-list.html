@@ -1,0 +1,14 @@
+<ul class="popup-select">
+    <ion-list class="users-list shared">
+        <ion-item ng-repeat="user in collection.owners">
+            <div class="row row-center">
+                <div class="col col-25 text-center" on-tap="goUserAccount(user.uid)">
+                    <img ng-src="{{user.image}}" width="60px" />
+                </div>
+                <div class="col">
+                    <div class="name" on-tap="goUserAccount(user.uid)">{{user.name}}</div>
+                </div>
+            </div>
+        </ion-item>
+    </ion-list>
+</ul>

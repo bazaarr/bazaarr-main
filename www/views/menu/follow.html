@@ -11,4 +11,10 @@
             Collections
         </button>
     </div>
+    <div class="col">
+        <button class="button button-small button-calm" ng-class="{active: $state.includes('account.following-hashtags')}"
+                ng-click="$state.go('account.following-hashtags')">
+            Hashtags
+        </button>
+    </div>
 </div>
