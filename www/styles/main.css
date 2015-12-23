@@ -1177,12 +1177,7 @@ ion-content.scroll-content {
     border-color: #66C4E3;
 }
 .login-button-fb {
-    padding: 6px;
-    background: #415DAE;
-    margin-top: 20px;
-    width: 100%;
-    border: none;
-    color: #fff;
+    text-decoration: underline;
 }
 .login-button-fb a {
     color: #fff;
@@ -3961,6 +3956,7 @@ hashtag-follow-button .button.button-calm {
 }
 .landing-view .slide {
     height: 100vh;
+    min-height: 440px;
     position: relative;
 }
 .landing-logo {
