@@ -23,5 +23,7 @@ deployment:
       commands:
         - ionic platform ios
         - ionic build --release ios
-        - cd platforms/
+        - pushd platforms/ios/
+        - ls -la
+        - popd
         - ls -la
