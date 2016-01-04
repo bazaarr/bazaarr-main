@@ -4,16 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width, minimal-ui">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Bazaarr">
     <meta name="theme-color" content="#fff">
-    <meta name="description" content="{{head.description}}" />
+    <meta name="description" content="{{head.description}}">
     <title ng-bind="head.title">Bazaarr</title>
     <link rel="icon" sizes="128x128" href="icon-128x128.png">
     <link rel="apple-touch-icon" sizes="120x120" href="touch-icon-iphone-retina.png">
-    <link rel="prev" href="{{head.prev_href}}">
-    <link rel="next" href="{{head.next_href}}">
-    <link rel="canonical" href="{{head.canonical_url}}">
+    <link rel="prev" href="%7B%7Bhead.prev_href%7D%7D">
+    <link rel="next" href="%7B%7Bhead.next_href%7D%7D">
+    <link rel="canonical" href="%7B%7Bhead.canonical_url%7D%7D">
     <script type="text/javascript">
         if ("standalone" in window.navigator && window.navigator.standalone && window.location.hash.indexOf("oauthcallback") == -1) {
             window.location = '#!/';
@@ -65,10 +65,10 @@
 <script src="app/core/landing/landing.controller.js"></script>
 <script src="app/core/landing/landing.service.js"></script>
 </head>        
-<body ng-controller="MainCtrl" class="state-{{$state.current.name.replace('wrap.', '')}}" ng-class="{'show-go-app' : !isInstructionBarHidden() && (isAndroid() || isIOS(9))}">
+<body ng-controller="MainCtrl" class="state-{{$state.current.name.replace(&apos;wrap.&apos;, &apos;&apos;)}}" ng-class="{&apos;show-go-app&apos; : !isInstructionBarHidden() &amp;&amp; (isAndroid() || isIOS(9))}">
     <ion-nav-bar class="bar-dark" on-hold="selectServer()">            
         <ion-nav-buttons side="secondary">                  
-            <button class="button search-button" on-tap="$state.go('search')">                      
+            <button class="button search-button" on-tap="$state.go(&apos;search&apos;)">                      
             <i class="ion-search"></i>        
             </button>
             <button ng-click="openPopover($event)" ng-if="isLogin()" class="button">
@@ -79,7 +79,7 @@
     
     <ion-nav-view></ion-nav-view>
 
-    <ng-include src="'views/main_tabs.html'"></ng-include>
+    <ng-include src="&apos;views/main_tabs.html&apos;"></ng-include>
 
     <toast></toast>
 </body>

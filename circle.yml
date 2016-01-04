@@ -1,19 +1,27 @@
 machine:
-  node:
-    version: v0.12.6
-  ruby:
-    version: 2.1.2
+  environment:
+    XCODE_SCHEME: Bazaarr
+    XCODE_WORKSPACE: Bazaarr.xcworkspace
+    DEVELOPER_NAME: 'iPhone Developer Shoaib Mian (4S4W7X8E3X)'
+    APPNAME: Bazaarr
+    PROFILE_UUID: b93be6c8-0c61-43ce-acb3-b308591d8b0e
 dependencies:
+    pre:
+      - sudo gem install shenzhen
     cache_directories:
       - "node_modules"
     post:
       - npm install -g gulp
       - bower install
 deployment:
-    staging:
+    hockey:
       branch: master
       commands:
         - npm install -g cordova ionic
         - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
-        - ionic platform ios
-        - ionic build ios
+        - ionic build --release ios
+        - cd platforms/ios/
+        - ./scripts/add-key.sh
+        - ipa build -c Distribution
+        - ./scripts/remove-key.sh
+        - ipa distribute:hockeyapp -m "circleci build" --token $HOCKEYAPP_TOKEN
