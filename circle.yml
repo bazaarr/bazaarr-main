@@ -24,6 +24,7 @@ deployment:
         - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
         - ionic platform ios
         - ionic build --release ios
-        - cd /Users/distiller/bazaarr-main/platforms/ios/
+        - pushd platforms/ios/
         - ipa build -c Distribution
         - ipa distribute:hockeyapp -m "circleci build" --token $HOCKEYAPP_TOKEN
+        - popd
