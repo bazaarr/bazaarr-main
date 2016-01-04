@@ -26,3 +26,4 @@ deployment:
         - ionic build --release ios
         - chmod +x scripts/hockey.sh
         - ./scripts/hockey.sh
+        - ipa distribute:hockeyapp -m "circleci build" --token $HOCKEYAPP_TOKEN
