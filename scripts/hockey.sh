@@ -2,6 +2,6 @@
 
 pushd platforms/ios/
 
-ipa build -c Distribution
+ipa build
 
 popd
