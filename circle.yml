@@ -17,10 +17,12 @@ dependencies:
 test:
   override:
     - npm install -g cordova ionic
+    - ionic platform ios
+    - ionic build --release ios
+    - cd platforms/ios/
+    - ls -la
 deployment:
     hockey:
       branch: master
       commands:
-        - ionic platform ios
-        - ionic build --release ios
-        - ./scripts/hockey.sh
+        - ls -la
