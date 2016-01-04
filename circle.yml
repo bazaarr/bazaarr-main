@@ -23,7 +23,4 @@ deployment:
       commands:
         - ionic platform ios
         - ionic build --release ios
-        - pushd platforms/ios/
-        - ls -la
-        - popd
-        - ls -la
+        - ./scripts/hockey.sh
