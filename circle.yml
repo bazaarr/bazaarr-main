@@ -14,6 +14,9 @@ dependencies:
     post:
       - npm install -g gulp
       - bower install
+test:
+  override:
+    - ./scripts/add-key.sh
 deployment:
     hockey:
       branch: master
@@ -22,7 +25,6 @@ deployment:
         - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
         - ionic build --release ios
         - cd platforms/ios/
-        - ./scripts/add-key.sh
         - ipa build -c Distribution
-        - ./scripts/remove-key.sh
         - ipa distribute:hockeyapp -m "circleci build" --token $HOCKEYAPP_TOKEN
+        - ./scripts/remove-key.sh
