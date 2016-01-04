@@ -16,15 +16,15 @@ dependencies:
       - bower install
 test:
   override:
-    - ./scripts/add-key.sh
+    - npm install -g cordova ionic
 deployment:
     hockey:
       branch: master
       commands:
-        - npm install -g cordova ionic
         - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
         - ionic build --release ios
         - cd platforms/ios/
+        - ./scripts/add-key.sh
         - ipa build -c Distribution
         - ipa distribute:hockeyapp -m "circleci build" --token $HOCKEYAPP_TOKEN
         - ./scripts/remove-key.sh
