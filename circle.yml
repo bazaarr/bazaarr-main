@@ -25,7 +25,5 @@ deployment:
         - ionic platform ios
         - ionic build --release ios
         - cd platforms/ios/
-        - ./scripts/add-key.sh
         - ipa build -c Distribution
         - ipa distribute:hockeyapp -m "circleci build" --token $HOCKEYAPP_TOKEN
-        - ./scripts/remove-key.sh
