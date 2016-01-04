@@ -8,7 +8,7 @@ machine:
 dependencies:
     pre:
       - sudo gem install shenzhen
-      - sudo gem install node
+      - brew install node
     cache_directories:
       - "node_modules"
     post:
