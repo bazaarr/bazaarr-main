@@ -25,5 +25,5 @@ deployment:
         - ionic platform ios
         - ionic build --release ios
         - cd platforms/ios/
-        - ipa build -c Distribution
+        - xcodebuild -scheme "Bazaarr" -configuration Release clean archive
         - ipa distribute:hockeyapp -m "circleci build" --token $HOCKEYAPP_TOKEN
