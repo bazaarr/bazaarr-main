@@ -1,7 +1,6 @@
 machine:
   environment:
     XCODE_SCHEME: Bazaarr
-    XCODE_WORKSPACE: Bazaarr.xcworkspace
     DEVELOPER_NAME: 'iPhone Developer Shoaib Mian (4S4W7X8E3X)'
     APPNAME: Bazaarr
     PROFILE_UUID: b93be6c8-0c61-43ce-acb3-b308591d8b0e
