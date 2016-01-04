@@ -21,6 +21,7 @@ deployment:
     hockey:
       branch: master
       commands:
+        - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
         - ionic platform ios
         - ionic build --release ios
         - chmod +x scripts/hockey.sh
