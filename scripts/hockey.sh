@@ -1,9 +1,7 @@
 #!/bin/sh
 
-pushd platforms/ios/build/
+pushd platforms/ios/
 
-ls -la
-
-#xcodebuild -scheme "Bazaarr" -configuration Release clean archive
+xcodebuild -project "Bazaarr"
 
 popd
