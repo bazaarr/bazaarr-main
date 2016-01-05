@@ -2,6 +2,6 @@
 
 pushd platforms/ios/
 
-xcodebuild -project "Bazaarr"
+ipa build
 
 popd
