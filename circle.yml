@@ -1,4 +1,6 @@
 machine:
+  xcode:
+    version: "7.1"
   environment:
     XCODE_SCHEME: Bazaarr
     XCODE_PROJECT: Bazaarr.xcodeproj
