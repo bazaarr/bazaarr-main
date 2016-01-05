@@ -2,6 +2,6 @@
 
 pushd platforms/ios/
 
-ipa build
+xcodebuild -scheme "$XCODE_SCHEME" -project "$XCODE_PROJECT" clean archive CODE_SIGN_IDENTITY="$DEVELOPER_NAME"
 
 popd
