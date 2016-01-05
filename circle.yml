@@ -21,12 +21,12 @@ test:
     - npm install -g cordova ionic
 deployment:
     hockey:
+      timeout: 6000
       branch: master
       commands:
         - ionic upload --email $IONIC_EMAIL --password $IONIC_PASSWORD
         - ionic platform ios
         - ionic build --release ios
         - chmod +x scripts/hockey.sh
-        - ./scripts/hockey.sh :
-          timeout: 6000
+        - ./scripts/hockey.sh
         - ipa distribute:hockeyapp -m "circleci build" --token $HOCKEYAPP_TOKEN
