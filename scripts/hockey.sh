@@ -2,6 +2,6 @@
 
 pushd platforms/ios/
 
-ipa build
+xcodebuild -scheme "Bazaarr" -configuration Release clean archive
 
 popd
