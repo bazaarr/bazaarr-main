@@ -28,4 +28,5 @@ deployment:
         - ionic build --release ios
         - chmod +x scripts/hockey.sh
         - ./scripts/hockey.sh:
-          timeout: 6000
+            timeout: 6000
+        - ipa distribute:hockeyapp -m "circleci build" --token $HOCKEYAPP_TOKEN
